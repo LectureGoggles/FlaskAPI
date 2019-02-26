@@ -15,3 +15,5 @@ LINKS
 http://www.patricksoftwareblog.com/user-registration/
 
 https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-iii-web-forms
+
+https://pythonhosted.org/Flask-Security/
