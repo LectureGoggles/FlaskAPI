@@ -1,0 +1,7 @@
+## REQUIREMENTS ##
+## RUNNING ##
+
+
+'''BASH
+$ source env/bin/activate
+/FlaskAPI $ flask run
