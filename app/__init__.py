@@ -1,34 +1,51 @@
 from flask import Flask
 from config import Config
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_cors import CORS
+from app.extensions import db, migrate, cache, cors, jwt
 
-
-app = Flask(__name__)
-CORS(app)
-app.config.from_object(Config)
-db = SQLAlchemy(app)
-migrate = Migrate(app, db)
-
-from app import views, models
+from app.user.models import User
+from app import user
 
 POSTGRES = {
     'user': 'zack',
     'pw': 'password',
-    'db': 'my_database',
+    'db': 'new_database',
     'host': 'localhost',
     'port': '5432',
 }
+
+# if __name__ == '__main__':
     
-app.config['DEBUG'] = True
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
-%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
-db.init_app(app)
+#     app.run(debug=True)    
 
-if __name__ == '__main__':
-    
-    app.run(debug=True)
+def create_app():
+    app = Flask(__name__)
+    origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
+    app.config.from_object(Config)
+    app.config['DEBUG'] = True
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
+    %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+
+    register_extensions(app, db)
+    register_blueprints(app)
+    return app
+
+def register_extensions(app, db):
+    """Register Flask extensions."""
+    #cache.init_app(app)
+    db.init_app(app)
+    migrate.init_app(app, db)
+    #jwt.init_app(app)
 
 
+def register_blueprints(app):
+    """Register Flask blueprints."""
+    origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
+    cors.init_app(user.views.blueprint, origins=origins)
+    app.register_blueprint(user.views.blueprint)
+
+def jwt_identity(payload):
+    return User.get_by_id(payload)
+
+def identity_loader(user):
+    return user.id
 
