@@ -15,3 +15,12 @@ class RegisterForm(FlaskForm):
     password = PasswordField('Password', validators=[DataRequired(), Length(min=6)])
     confirm = PasswordField('Repeat Password', validators=[DataRequired(), EqualTo('password')])
     school = StringField('School', validators=[DataRequired(), Length(min=2, max=80)])
+
+class ResourceCreation(FlaskForm):
+    subject = StringField("Subject Name", validators=[DataRequired(), Length(max=50)])
+    description = StringField("Description", validators=[DataRequired(), Length(max=200)])
+
+class SubjectCreation(FlaskForm):
+    subject = StringField("Subject Name", validators=[DataRequired(), Length(max=50)])
+    description = StringField("Description", validators=[DataRequired(), Length(max=200)])
+    
