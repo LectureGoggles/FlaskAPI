@@ -8,7 +8,7 @@ from app import user
 POSTGRES = {
     'user': 'zack',
     'pw': 'password',
-    'db': 'new_database',
+    'db': 'mydb',
     'host': 'localhost',
     'port': '5432',
 }
