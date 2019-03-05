@@ -25,23 +25,4 @@ class BaseModel(db.Model):
             for column, value in self._to_dict().items()
         }
 
-class Subject(db.Model):
-    __tablename__ = 'subjects'
 
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    subject = db.Column(db.String(50), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    description = db.Column(db.String(200), nullable=False)
-    created = db.Column(db.DateTime, default=datetime.datetime.now)
-
-
-class Resource(db.Model):
-    __tablename__ = 'resources'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    subject = db.Column(db.String(50), nullable=False)
-    author_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    author = db.Column(db.String(50), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    upvote = db.Column(db.Integer, default=0)
-    created = db.Column(db.DateTime, default=datetime.datetime.now)

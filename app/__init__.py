@@ -3,7 +3,7 @@ from config import Config
 from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt
 
 from app.user.models import User
-from app import user
+from app import user, post
 
 POSTGRES = {
     'user': 'zack',
@@ -43,5 +43,7 @@ def register_blueprints(app):
     """Register Flask blueprints."""
     origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
     cors.init_app(user.views.blueprint, origins=origins)
+    cors.init_app(post.views.blueprint, origins=origins)
     app.register_blueprint(user.views.blueprint)
+    app.register_blueprint(post.views.blueprint)
 

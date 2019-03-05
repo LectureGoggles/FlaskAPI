@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from app.extensions import db
-from flask_login import UserMixin
 import datetime as dt
+from flask_login import UserMixin
 
 class User(UserMixin, db.Model):
 
