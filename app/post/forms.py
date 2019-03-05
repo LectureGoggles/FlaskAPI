@@ -9,4 +9,3 @@ class ResourceCreation(FlaskForm):
 class SubjectCreation(FlaskForm):
     subject = StringField("Subject Name", validators=[DataRequired(), Length(max=50)])
     description = StringField("Description", validators=[DataRequired(), Length(max=200)])
-    
