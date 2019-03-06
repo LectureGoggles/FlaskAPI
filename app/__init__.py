@@ -19,8 +19,7 @@ def create_app():
     app.config['DEBUG'] = False
     
     # Database
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:\
-    %(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
 
     # Function calls
     register_extensions(app, db)
