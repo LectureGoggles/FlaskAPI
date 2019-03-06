@@ -43,6 +43,6 @@ def register_blueprints(app):
     origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
     cors.init_app(user.views.blueprint, origins=origins)
     cors.init_app(post.views.blueprint, origins=origins)
-    app.register_blueprint(user.views.blueprint)
     app.register_blueprint(post.views.blueprint)
+    app.register_blueprint(user.views.blueprint)
 
