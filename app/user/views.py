@@ -24,14 +24,13 @@ def _register_user():
 @blueprint.route('/users/login', methods=('POST',))
 def _login_user():
     form = LoginForm()
-    print(user.email)
+    user = User.query.filter_by(email=form.email.data).first()
     if user:
         if bcrypt.check_password_hash(user.password, form.password.data):
             # authenticate user and resave into db
             user.authenticate = True
             db.session.add(user)
             db.session.commit()
-            login_user(user)
             flash('Login requested for user {}'.format(user.email))
             access_token = create_access_token(identity=user.username) #Create access token for user
             return jsonify(access_token=access_token), 200
@@ -39,8 +38,7 @@ def _login_user():
     return json.dumps({'Login':False}), 500, {'ContentType':'application/json'} 
 
 @blueprint.route("/users/logout", methods=["GET"])
-@login_required
-def logout():
+def _logout():
     """Logout the current user."""
     user = current_user
     user.authenticated = False
@@ -48,6 +46,3 @@ def logout():
     db.session.commit()
     logout_user()
 
-@login_manager.user_loader
-def load_user(user_id):
-    return User.query.filter_by(email=user_id).first()
