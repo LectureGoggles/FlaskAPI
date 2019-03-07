@@ -1,6 +1,6 @@
 # user/views.py
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user
+from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity
 from flask import jsonify, json, render_template, flash, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -10,18 +10,24 @@ from .models import User
 
 blueprint = Blueprint('user', __name__)
 
-@blueprint.route('/users/signup', methods=('POST',))
+
+@blueprint.route('/users/signup', methods=('POST', ))
 def _register_user():
 
     form = RegisterForm()
-    user = User(username=form.username.data, email=form.email.data, password=bcrypt.generate_password_hash(form.password.data), school=form.school.data)
+    user = User(
+        username=form.username.data,
+        email=form.email.data,
+        password=bcrypt.generate_password_hash(form.password.data),
+        school=form.school.data)
     db.session.add(user)
     db.session.commit()
     return jsonify("true")
 
-    #return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
+    # return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
 
-@blueprint.route('/users/login', methods=('POST',))
+
+@blueprint.route('/users/login', methods=('POST', ))
 def _login_user():
     form = LoginForm()
     user = User.query.filter_by(email=form.email.data).first()
@@ -32,10 +38,14 @@ def _login_user():
             db.session.add(user)
             db.session.commit()
             flash('Login requested for user {}'.format(user.email))
-            access_token = create_access_token(identity=user.username) #Create access token for user
+            access_token = create_access_token(
+                identity=user.username)  # Create access token for user
             return jsonify(access_token=access_token), 200
-        
-    return json.dumps({'Login':False}), 500, {'ContentType':'application/json'} 
+
+    return json.dumps({'Login': False}), 500, {
+        'ContentType': 'application/json'
+    }
+
 
 @blueprint.route("/users/logout", methods=["GET"])
 def _logout():
@@ -46,3 +56,10 @@ def _logout():
     db.session.commit()
     logout_user()
 
+
+@blueprint.route("/users/auth", methods=["GET"])
+@jwt_optional
+def _auth():
+    current_user = get_jwt_identity()
+    print(current_user)
+    return jsonify(logged_in_as=current_user), 200
