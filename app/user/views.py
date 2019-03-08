@@ -13,13 +13,17 @@ blueprint = Blueprint('user', __name__)
 @blueprint.route('/users/signup', methods=('POST',))
 def _register_user():
 
+    duplicateuser = User.query.filter_by(email=form.email.data).first()
+    if duplicateuser:
+        return jsonify(status=fail, code=400)
+
     form = RegisterForm()
     user = User(username=form.username.data, email=form.email.data, password=bcrypt.generate_password_hash(form.password.data), school=form.school.data)
-    db.session.add(user)
-    db.session.commit()
-    return jsonify("true")
-
-    #return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
+    
+    if user:
+        db.session.add(user)
+        db.session.commit()
+        return json.dumps({'success':True}), 201
 
 @blueprint.route('/users/login', methods=('POST',))
 def _login_user():
@@ -28,21 +32,14 @@ def _login_user():
     if user:
         if bcrypt.check_password_hash(user.password, form.password.data):
             # authenticate user and resave into db
-            user.authenticate = True
             db.session.add(user)
             db.session.commit()
             flash('Login requested for user {}'.format(user.email))
             access_token = create_access_token(identity=user.username) #Create access token for user
-            return jsonify(access_token=access_token), 200
+            return jsonify(access_token=access_token, success=True, response=200)
         
-    return json.dumps({'Login':False}), 500, {'ContentType':'application/json'} 
+    return json.dumps({'Login':False}), 400
 
-@blueprint.route("/users/logout", methods=["GET"])
-def _logout():
-    """Logout the current user."""
-    user = current_user
-    user.authenticated = False
-    db.session.add(user)
-    db.session.commit()
-    logout_user()
+
+
 
