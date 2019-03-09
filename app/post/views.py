@@ -1,4 +1,4 @@
-from flask import Blueprint, request
+from flask import Blueprint, request, redirect
 from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity
 from flask import jsonify, json, render_template, flash, redirect, request
 
@@ -27,7 +27,17 @@ def _subjectcreate():
             description=form.description.data,
             author_id=user.id
         )
+        db.session.add(subject)
+        db.session.commit()
     
     return jsonify(success='False', code=400, description='invalid token')
 
-    # TODO(zack): implement
+@blueprint.route('/subject/search/<subjectstr>')
+def _getsubject(subjectstr)
+    getsubject = Subject.query.filder_by(subject=subjectstr).first()
+
+    if getsubject:
+        return jsonify(subjectid=getsubjet.id, success='True', code=200)
+    else:
+        return jsonify(success='False', code=400, description='subject does not exist')
+
