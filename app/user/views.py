@@ -12,9 +12,12 @@ import datetime
 
 blueprint = Blueprint('user', __name__)
 
-
 @blueprint.route('/users/signup', methods=('POST', ))
 def _register_user():
+
+    duplicateuser = User.query.filter_by(email=form.email.data).first()
+    if duplicateuser:
+        return jsonify(success='False', code=400)
 
     form = RegisterForm()
     user = User(
@@ -26,8 +29,6 @@ def _register_user():
     db.session.commit()
     return jsonify("true")
 
-    # return json.dumps({'success':False}), 200, {'ContentType':'application/json'}
-
 
 @blueprint.route('/users/login', methods=('POST', ))
 def _login_user():
@@ -36,7 +37,6 @@ def _login_user():
     if user:
         if bcrypt.check_password_hash(user.password, form.password.data):
             # authenticate user and resave into db
-            user.authenticate = True
             db.session.add(user)
             db.session.commit()
             flash('Login requested for user {}'.format(user.email))
