@@ -8,6 +8,8 @@ from app.extensions import db, login_manager, bcrypt
 from .forms import RegisterForm, LoginForm
 from .models import User
 
+import datetime
+
 blueprint = Blueprint('user', __name__)
 
 @blueprint.route('/users/signup', methods=('POST', ))
@@ -38,14 +40,28 @@ def _login_user():
             db.session.add(user)
             db.session.commit()
             flash('Login requested for user {}'.format(user.email))
-            access_token = create_access_token(identity=user.username) #Create access token for user
-            return jsonify(access_token=access_token, success='True', response=200)
-        
-    return json.dumps({'Login':False}), 400
+            expires = datetime.timedelta(days=30)
+            access_token = create_access_token(
+                identity=user.username, expires_delta=expires)  # Create access token for user
+            return jsonify(access_token=access_token), 200
+
+    return json.dumps({'Login': False}), 500, {
+        'ContentType': 'application/json'
+    }
+
+
+@blueprint.route("/users/logout", methods=["GET"])
+def _logout():
+    """Logout the current user."""
+    user = current_user
+    user.authenticated = False
+    db.session.add(user)
+    db.session.commit()
+    logout_user()
+
 
 @blueprint.route("/users/auth", methods=["GET"])
 @jwt_optional
 def _auth():
     current_user = get_jwt_identity()
-    print(current_user)
     return jsonify(logged_in_as=current_user), 200
