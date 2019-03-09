@@ -29,6 +29,7 @@ def _subjectcreate():
         )
         db.session.add(subject)
         db.session.commit()
+        return jsonify(success='True', code=200)
     
     return jsonify(success='False', code=400, description='invalid token')
 
