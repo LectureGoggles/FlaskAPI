@@ -6,7 +6,7 @@ from app.user.models import User
 from app import user, post
 
 POSTGRES = {
-    'user': 'nyocum',
+    'user': 'zack',
     'pw': 'password',
     'db': 'mydb1',
     'host': 'localhost',
