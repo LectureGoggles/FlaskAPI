@@ -5,6 +5,7 @@ from flask import jsonify, json, render_template, flash, redirect, request
 from app.extensions import db, login_manager, bcrypt
 from .forms import ResourceCreation, SubjectCreation
 from .models import Subject, Resource
+from app.user.models import User
 
 blueprint = Blueprint('post', __name__)
 
@@ -31,14 +32,20 @@ def _subjectcreate():
         db.session.commit()
         return jsonify(success='True', code=200)
     
-    return jsonify(success='False', code=400, description='invalid token')
+    return jsonify(success='False', code=400)
 
-@blueprint.route('/subject/search/<subjectstr>')
+@blueprint.route('/subject/search/<subjectstr>', methods=['GET',])
 def _getsubject(subjectstr):
-    getsubject = Subject.query.filder_by(subject=subjectstr).first()
+    getsubject = Subject.query.filter_by(subject=subjectstr).first()
 
     if getsubject:
-        return jsonify(subject_id=getsubjet.id, subject_name=getsubject.subject, subject_description=getsubject.description, success='True', code=200)
+        return jsonify(subject_id=getsubject.id, subject_name=getsubject.subject, subject_description=getsubject.description, success='True', code=200)
     else:
         return jsonify(success='False', code=400, description='subject does not exist')
 
+@blueprint.route('/<int:subjectid>/post/create')
+@jwt_required
+def _postcreate(subjectid):
+    getsubject = Subject.query.filter_by(id=subjectid).first()
+    #TODO(zack):
+    return jsonify(success='False')

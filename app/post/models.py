@@ -20,6 +20,7 @@ class Resource(db.Model):
     subject = db.Column(db.String(50), nullable=False)
     author_id = db.Column(db.Integer) # TODO(zack): , db.ForeignKey('user.id')
     author = db.Column(db.String(50), nullable=False)
+    relation = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     upvote = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
