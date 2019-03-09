@@ -33,11 +33,11 @@ def _subjectcreate():
     return jsonify(success='False', code=400, description='invalid token')
 
 @blueprint.route('/subject/search/<subjectstr>')
-def _getsubject(subjectstr)
+def _getsubject(subjectstr):
     getsubject = Subject.query.filder_by(subject=subjectstr).first()
 
     if getsubject:
-        return jsonify(subjectid=getsubjet.id, success='True', code=200)
+        return jsonify(subject_id=getsubjet.id, subject_name=getsubject.subject, subject_description=getsubject.description, success='True', code=200)
     else:
         return jsonify(success='False', code=400, description='subject does not exist')
 
