@@ -47,5 +47,25 @@ def _getsubject(subjectstr):
 @jwt_required
 def _postcreate(subjectid):
     getsubject = Subject.query.filter_by(id=subjectid).first()
-    #TODO(zack):
-    return jsonify(success='False')
+    current_user = get_jwt_identity()
+
+    #is this a valid subject
+    if getsubject:
+        user = User.query.filter_by(username=current_user).first()
+        post = Resource(
+            subject = form.subject.data,
+            description = form.description.data,
+            author_id = current_user.id,
+            author = current_user.username,
+            relation_id = subjectid
+        )
+        db.session.add(post)
+        db.session.commit()
+        return jsonify(sucess='True', code=200)
+
+    return jsonify(success='False', code=200)
+
+# NOTES
+# _postcreate(subjectid)
+# Relation to the subject is posted to but not sure if we'll need to add
+# children to the subject itself.
