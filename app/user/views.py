@@ -15,11 +15,11 @@ blueprint = Blueprint('user', __name__)
 @blueprint.route('/users/signup', methods=('POST', ))
 def _register_user():
 
+    form = RegisterForm()
     duplicateuser = User.query.filter_by(email=form.email.data).first()
     if duplicateuser:
         return jsonify(success='False', code=400)
 
-    form = RegisterForm()
     user = User(
         username=form.username.data,
         email=form.email.data,
