@@ -3,12 +3,13 @@ from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, 
 from flask import jsonify, json, render_template, flash, redirect, request
 
 from app.extensions import db, login_manager, bcrypt
-from .forms import ResourceCreation, SubjectCreation
-from .models import Subject, Resource
+from .forms import SubjectCreation, TopicCreation, PostCreation
+from .models import Subject, Topic, Post
 from app.user.models import User
 
 blueprint = Blueprint('post', __name__)
 
+### SUBJECT
 @blueprint.route('/subject/create', methods=['POST',])
 @jwt_required
 def _subjectcreate():
@@ -24,7 +25,7 @@ def _subjectcreate():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         subject = Subject(
-            subject=form.subject.data,
+            subject=form.subject.data.lower(),
             description=form.description.data,
             author_id=user.id
         )
@@ -43,21 +44,52 @@ def _getsubject(subjectstr):
     else:
         return jsonify(success='False', code=400, description='subject does not exist')
 
-@blueprint.route('/<int:subjectid>/post/create')
+
+### POST
+@blueprint.route('/<int:topicid>/post/create')
 @jwt_required
-def _postcreate(subjectid):
-    getsubject = Subject.query.filter_by(id=subjectid).first()
+def _postcreate(topicid):
+    getpost = Topic.query.filter_by(id=topicid).first()
     current_user = get_jwt_identity()
 
+    duplicatepost = Post.query.filter_by(subject=form.subject.data).first()
+    if duplicatepost:
+        return jsonify(success='False', code=400, description='duplicate subject')
+
     #is this a valid subject
-    if getsubject:
+    if getpost:
         user = User.query.filter_by(username=current_user).first()
         post = Resource(
-            subject = form.subject.data,
+            subject = form.subject.data.lower(),
             description = form.description.data,
             author_id = current_user.id,
-            author = current_user.username,
-            relation_id = subjectid
+            topic_id = topicid,
+        )
+        db.session.add(post)
+        db.session.commit()
+        return jsonify(sucess='True', code=200)
+
+    return jsonify(success='False', code=200)
+
+### TOPIC
+@blueprint.route('/<int:subjectid>/topic/create')
+@jwt_required
+def _posttopic(subjectid):
+    gettopic = Post.query.filter_by(id=subjectid).first()
+    current_user = get_jwt_identity()
+
+    duplicatetopic = Post.query.filter_by(subject=form.subject.data).first()
+    if duplicatetopic:
+        return jsonify(success='False', code=400, description='duplicate subject')
+
+    #is this a valid subject
+    if gettopic:
+        user = User.query.filter_by(username=current_user).first()
+        post = Resource(
+            subject = form.subject.data.lower(),
+            description = form.description.data,
+            author_id = current_user.id,
+            topic_id = subjectid,
         )
         db.session.add(post)
         db.session.commit()
@@ -66,6 +98,7 @@ def _postcreate(subjectid):
     return jsonify(success='False', code=200)
 
 # NOTES
+# TODO(zack)
 # _postcreate(subjectid)
 # Relation to the subject is posted to but not sure if we'll need to add
 # children to the subject itself.
