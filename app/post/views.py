@@ -37,7 +37,7 @@ def _subjectcreate():
 
 @blueprint.route('/subject/search/<subjectstr>', methods=['GET',])
 def _getsubject(subjectstr):
-    getsubject = Subject.query.filter_by(subject=subjectstr).first()
+    getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
     if getsubject:
         return jsonify(subject_id=getsubject.id, subject_name=getsubject.subject, subject_description=getsubject.description, success='True', code=200)

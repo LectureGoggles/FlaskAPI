@@ -13,7 +13,7 @@ class Subject(db.Model):
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
     # Relation with topic
-    addresses = db.relationship('Topic', backref='subject', lazy=True)
+    addresses = db.relationship('Topic', backref='subjects', lazy=True)
 
 class Topic(db.Model):
     __tablename__= 'topics'
@@ -25,7 +25,7 @@ class Topic(db.Model):
 
     # Relation with subject and post
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
-    posts = db.relationship('Post', backref='topic', lazy=True)
+    posts = db.relationship('Post', backref='topics', lazy=True)
     
 
 class Post(db.Model):
