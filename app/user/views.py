@@ -1,6 +1,6 @@
 # user/views.py
 from flask import Blueprint, request
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity, jwt_refresh_token_required
+from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
 from flask import jsonify, json, render_template, flash, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
 
@@ -45,7 +45,7 @@ def _login_user():
             expires = datetime.timedelta(days=30)
             access_token = create_access_token(
                 identity=user.username, expires_delta=expires)  # Create access token for user
-            refresh_token = create_refresh_token(identity=username, expires_delta=expires)
+            refresh_token = create_refresh_token(identity=user.username, expires_delta=expires)
             return jsonify(access_token=access_token, refresh_token=refresh_token), 200
 
     return json.dumps({'Login': False}), 500, {
