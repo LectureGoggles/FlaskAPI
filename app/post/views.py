@@ -17,7 +17,7 @@ def _subjectcreate():
     current_user = get_jwt_identity()
 
     # check for subject already created
-    duplicatesubject = Subject.query.filter_by(subject=form.subject.data).first()
+    duplicatesubject = Subject.query.filter_by(subject=form.subject.data.lower()).first()
     if duplicatesubject:
         return jsonify(success='False', code=400, description='duplicate subject')
 
