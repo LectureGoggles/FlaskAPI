@@ -46,10 +46,10 @@ def _getsubject(subjectstr):
 
 
 ### POST
-@blueprint.route('/<int:topicid>/post/create')
+@blueprint.route('/<int:topicid>/post/create', methods=['POST',])
 @jwt_required
 def _postcreate(topicid):
-    getpost = Topic.query.filter_by(id=topicid).first()
+    form = PostCreation()
     current_user = get_jwt_identity()
 
     duplicatepost = Post.query.filter_by(subject=form.subject.data).first()
@@ -57,12 +57,12 @@ def _postcreate(topicid):
         return jsonify(success='False', code=400, description='duplicate subject')
 
     #is this a valid subject
-    if getpost:
+    if current_user:
         user = User.query.filter_by(username=current_user).first()
-        post = Resource(
-            subject = form.subject.data.lower(),
+        post = Post(
+            subject = form.subject.data,
             description = form.description.data,
-            author_id = current_user.id,
+            author_id = user.id,
             topic_id = topicid,
         )
         db.session.add(post)
@@ -72,26 +72,26 @@ def _postcreate(topicid):
     return jsonify(success='False', code=200)
 
 ### TOPIC
-@blueprint.route('/<int:subjectid>/topic/create')
+@blueprint.route('/<int:subjectid>/topic/create', methods=['POST',])
 @jwt_required
 def _posttopic(subjectid):
-    gettopic = Post.query.filter_by(id=subjectid).first()
+    form = TopicCreation()
     current_user = get_jwt_identity()
 
-    duplicatetopic = Post.query.filter_by(subject=form.subject.data).first()
+    duplicatetopic = Topic.query.filter_by(subject=form.subject.data).first()
     if duplicatetopic:
         return jsonify(success='False', code=400, description='duplicate subject')
 
     #is this a valid subject
-    if gettopic:
+    if current_user:
         user = User.query.filter_by(username=current_user).first()
-        post = Resource(
-            subject = form.subject.data.lower(),
+        topic = Topic(
+            subject = form.subject.data,
             description = form.description.data,
-            author_id = current_user.id,
-            topic_id = subjectid,
+            author_id = user.id,
+            subject_id = subjectid
         )
-        db.session.add(post)
+        db.session.add(topic)
         db.session.commit()
         return jsonify(sucess='True', code=200)
 
