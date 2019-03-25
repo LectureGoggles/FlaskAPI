@@ -26,7 +26,11 @@ def _subjectcreate():
         return jsonify(err.messages), 422
 
     # check for subject already created
+<<<<<<< HEAD
     duplicatesubject = Subject.query.filter_by(subject=json_data['subject']).first()
+=======
+    duplicatesubject = Subject.query.filter_by(subject=form.subject.data.lower()).first()
+>>>>>>> f69483b901db59a1f1afc9b8caab711f167989ee
     if duplicatesubject:
         return jsonify({"message": "Duplicate subject"}), 400
 
