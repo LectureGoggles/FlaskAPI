@@ -1,6 +1,6 @@
 from flask import Flask
 from config import Config
-from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt
+from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt, ma
 
 from app.user.models import User
 from app import user, post
@@ -38,6 +38,7 @@ def register_extensions(app, db):
     jwt.init_app(app)
     login_manager.init_app(app)
     bcrypt.init_app(app)
+    ma.init_app(app)
 
 
 def register_blueprints(app):

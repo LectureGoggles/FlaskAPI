@@ -3,10 +3,12 @@ from flask import Blueprint, request
 from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
 from flask import jsonify, json, render_template, flash, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
+from marshmallow import ValidationError
 
 from app.extensions import db, login_manager, bcrypt
 from .forms import RegisterForm, LoginForm
 from .models import User
+from .schema import UserSchema, user_schema, users_schema
 
 import datetime
 
@@ -15,21 +17,36 @@ blueprint = Blueprint('user', __name__)
 @blueprint.route('/users/signup', methods=('POST', ))
 def _register_user():
 
-    form = RegisterForm()
-    duplicateuser = User.query.filter_by(email=form.email.data).first()
+    json_data = request.get_json()
+    
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+
+    try:
+        user_data = user_schema.load(json_data)
+    except ValidationError as err:
+        return jsonify(err.messages), 422
+
+    duplicateuser = User.query.filter_by(email=json_data['email']).first()
     if duplicateuser:
-        return jsonify(success='False', code=400)
+        return jsonify({'message': 'Duplicate user'}), 400
 
     user = User(
-        username=form.username.data,
-        email=form.email.data,
-        firstname=form.firstname.data,
-        lastname=form.lastname.data,
-        password=bcrypt.generate_password_hash(form.password.data),
-        school=form.school.data)
+        username=json_data['username'],
+        email=json_data['email'],
+        firstname=json_data['firstname'],
+        lastname=json_data['lastname'],
+        password=bcrypt.generate_password_hash(json_data['password']),
+        school=json_data['school'])
     db.session.add(user)
     db.session.commit()
     return jsonify("true")
+
+@blueprint.route('/users/', methods=('GET',))
+def _get_user():
+    users = User.query.all()
+    result = users_schema.dump(users, many=True)
+    return jsonify({'users': result})
 
 
 @blueprint.route('/users/login', methods=('POST', ))
