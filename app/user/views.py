@@ -27,17 +27,17 @@ def _register_user():
     except ValidationError as err:
         return jsonify(err.messages), 422
 
-    duplicateuser = User.query.filter_by(email=json_data['email']).first()
+    duplicateuser = User.query.filter_by(email=json_data['email'].lower()).first()
     if duplicateuser:
         return jsonify({'message': 'Duplicate user'}), 400
 
     user = User(
-        username=json_data['username'],
-        email=json_data['email'],
-        firstname=json_data['firstname'],
-        lastname=json_data['lastname'],
+        username=json_data['username'].lower(),
+        email=json_data['email'].lower(),
+        firstname=json_data['firstname'].lower(),
+        lastname=json_data['lastname'].lower(),
         password=bcrypt.generate_password_hash(json_data['password']),
-        school=json_data['school'])
+        school=json_data['school'].lower())
     db.session.add(user)
     db.session.commit()
     return jsonify("true")
