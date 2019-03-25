@@ -26,7 +26,7 @@ def _subjectcreate():
         return jsonify(err.messages), 422
 
     # check for subject already created
-    duplicatesubject = Subject.query.filter_by(subject=json_data['subject']).first()
+    duplicatesubject = Subject.query.filter_by(subject=json_data['subject'].lower()).first()
     if duplicatesubject:
         return jsonify({"message": "Duplicate subject"}), 400
 
@@ -35,8 +35,8 @@ def _subjectcreate():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         subject = Subject(
-            subject=json_data['subject'],
-            description=json_data['description'],
+            subject=json_data['subject'].lower(),
+            description=json_data['description'].lower(),
             author_id=user.id
         )
         db.session.add(subject)
@@ -73,7 +73,7 @@ def _posttopic(subjectid):
         return jsonify(err.messages), 422
 
     # check for post already created
-    duplicatetopic = Topic.query.filter_by(subject=json_data['subject']).first()
+    duplicatetopic = Topic.query.filter_by(subject=json_data['subject'].lower()).first()
     if duplicatetopic:
         return jsonify({"message": "Duplicate post"}), 400
 
@@ -82,8 +82,8 @@ def _posttopic(subjectid):
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         topic = Topic(
-            subject=json_data['subject'],
-            description=json_data['description'],
+            subject=json_data['subject'].lower(),
+            description=json_data['description'].lower(),
             author_id = user.id,
             subject_id = subjectid
         )
@@ -113,7 +113,7 @@ def _postcreate(topicid):
         return jsonify(err.messages), 422
 
     # check for post already created
-    duplicatepost = Post.query.filter_by(subject=json_data['subject']).first()
+    duplicatepost = Post.query.filter_by(subject=json_data['subject'].lower).first()
     if duplicatepost:
         return jsonify({"message": "Duplicate post"}), 400
 
@@ -123,8 +123,8 @@ def _postcreate(topicid):
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         post = Post(
-            subject=json_data['subject'],
-            description=json_data['description'],
+            subject=json_data['subject'].lower(),
+            description=json_data['description'].lower(),
             author_id = user.id,
             topic_id = topicid,
         )
