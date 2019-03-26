@@ -41,3 +41,15 @@ class Post(db.Model):
 
     # Relation with topic
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
+
+class Report(db.Model):
+    __tablename__ = 'reports'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    author_id = db.Column(db.String(50))
+    reported_post_id = db.Column(db.Integer, nullable=False)
+    description = db.Column(db.String(400), nullable=False)
+    created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
+    updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+
+    resolved_by = db.Column(db.String(50), default="unresolved")
