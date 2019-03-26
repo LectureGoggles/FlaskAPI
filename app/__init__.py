@@ -6,10 +6,10 @@ from app.user.models import User
 from app import user, post
 
 POSTGRES = {
-    'user': 'zack',
+    'user': 'admin',
     'pw': 'password',
-    'db': 'mydb1',
-    'host': 'localhost',
+    'db': 'postgres',
+    'host': '10.0.3.4',
     'port': '5432',
 }
 
@@ -19,6 +19,7 @@ def create_app():
     app.config.from_object(Config)
     app.config['DEBUG'] = False
 
+    # Using an internal ip 10.0.3.4
     # Database
     app.config[
         'SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
