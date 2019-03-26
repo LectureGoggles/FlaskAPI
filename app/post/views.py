@@ -5,11 +5,12 @@ from marshmallow import ValidationError
 
 from app.extensions import db, login_manager, bcrypt
 from .forms import SubjectCreation, TopicCreation, PostCreation
-from .models import Subject, Topic, Post
+from .models import Subject, Topic, Post, Report
 from app.user.models import User
 from .schema import SubjectSchema, subject_schema, subjects_schema
 from .schema import TopicSchema, topic_schema, topics_schema
 from .schema import PostSchema, post_schema, posts_schema
+from .schema import ReportSchema, report_schema, reports_schema
 
 blueprint = Blueprint('post', __name__)
 
@@ -113,7 +114,7 @@ def _postcreate(topicid):
         return jsonify(err.messages), 422
 
     # check for post already created
-    duplicatepost = Post.query.filter_by(subject=json_data['subject'].lower).first()
+    duplicatepost = Post.query.filter_by(subject=json_data['subject'].lower()).first()
     if duplicatepost:
         return jsonify({"message": "Duplicate post"}), 400
 
@@ -140,3 +141,52 @@ def _getpostall(topicid):
     posts = Post.query.filter_by(topic_id=topicid).all()
     result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': result})
+
+
+### REPORTS
+
+@blueprint.route('/<int:postid>/report/', methods=['POST',])
+@jwt_optional
+def _createreport(postid):
+    json_data = request.get_json()
+
+    try:
+        report_data = report_schema.load(json_data)
+    except ValidationError as err:
+        return jsonify(err.messages), 422
+
+    #is this a valid subject
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        report = Report(
+            description=json_data['description'].lower(),
+            reported_post_id=postid,
+            author_id = user.id,
+        )
+        db.session.add(report)
+        db.session.commit()
+        return jsonify({"message": "Success"}), 200
+    else:
+        user = User.query.filter_by(username=current_user).first()
+        report = Report(
+            description=json_data['description'].lower(),
+            reported_post_id=postid,
+        )
+        db.session.add(report)
+        db.session.commit()
+        return jsonify({"message": "Success"}), 200
+
+    return jsonify({"message": "Fail"}), 400
+
+@blueprint.route('/<int:postid>/report/', methods=['GET',])
+def _getpostreports(topicid):
+    reports = Report.query.filter_by(topic_id=topicid).all()
+    result = reports_schema.dump(reports, many=True)
+    return jsonify({'reports': result})
+
+@blueprint.route('/report/', methods=['GET',])
+def _getreportsall():
+    reports = Report.query.all()
+    result = reports_schema.dump(reports, many=True)
+    return jsonify({'reports': result})

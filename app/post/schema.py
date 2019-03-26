@@ -1,5 +1,5 @@
 from app.extensions import ma
-from .models import Subject, Topic, Post
+from .models import Subject, Topic, Post, Report
 
 class SubjectSchema(ma.ModelSchema):
     class Meta:
@@ -26,3 +26,11 @@ class PostSchema(ma.ModelSchema):
 
 post_schema = PostSchema()
 posts_schema = PostSchema(many=True)
+
+class ReportSchema(ma.ModelSchema):
+    class Meta:
+        model = Report
+        fields = ('id', 'description', 'reported_post_id', 'resolved_by')
+
+report_schema = ReportSchema()
+reports_schema = ReportSchema(many=True)
