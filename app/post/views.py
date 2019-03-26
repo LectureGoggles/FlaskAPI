@@ -5,12 +5,13 @@ from marshmallow import ValidationError
 
 from app.extensions import db, login_manager, bcrypt
 from .forms import SubjectCreation, TopicCreation, PostCreation
-from .models import Subject, Topic, Post, Report
+from .models import Subject, Topic, Post, Report, UpvotePost
 from app.user.models import User
 from .schema import SubjectSchema, subject_schema, subjects_schema
 from .schema import TopicSchema, topic_schema, topics_schema
 from .schema import PostSchema, post_schema, posts_schema
 from .schema import ReportSchema, report_schema, reports_schema
+from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
 
 blueprint = Blueprint('post', __name__)
 
@@ -180,8 +181,8 @@ def _createreport(postid):
     return jsonify({"message": "Fail"}), 400
 
 @blueprint.route('/<int:postid>/report/', methods=['GET',])
-def _getpostreports(topicid):
-    reports = Report.query.filter_by(topic_id=topicid).all()
+def _getpostreports(postid):
+    reports = Report.query.filter_by(reported_post_id=postid).all()
     result = reports_schema.dump(reports, many=True)
     return jsonify({'reports': result})
 
@@ -190,3 +191,41 @@ def _getreportsall():
     reports = Report.query.all()
     result = reports_schema.dump(reports, many=True)
     return jsonify({'reports': result})
+
+## UPVOTE POST
+@blueprint.route('/<int:postid>/vote/', methods=['POST',])
+@jwt_required
+def _createvote(postid):
+    json_data = request.get_json()
+
+    try:
+        upvote_data = upvote_schema.load(json_data)
+    except ValidationError as err:
+        return jsonify(err.messages), 422
+
+    #is this a valid subject
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        upvote = UpvotePost(
+            vote_choice=json_data['vote_choice'],
+            post_id=postid,
+            user_id= user.id,
+        )
+        db.session.add(upvote)
+        db.session.commit()
+        return jsonify({"message": "Success"}), 200
+
+    return jsonify({"message": "Fail"}), 400
+
+@blueprint.route('/<int:postid>/vote/', methods=['GET',])
+def _getpostvotes(postid):
+    votes = UpvotePost.query.filter_by(post_id=postid).all()
+    result = upvotes_schema.dump(votes, many=True)
+    return jsonify({'reports': result})
+
+@blueprint.route('/vote/', methods=['GET',])
+def _getvotesall():
+    votes = UpvotePost.query.all()
+    result = upvotes_schema.dump(reports, many=True)
+    return jsonify({'votes': result})

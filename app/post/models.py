@@ -33,7 +33,7 @@ class Post(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     subject = db.Column(db.String(50), nullable=False)
-    author_id = db.Column(db.String(50), nullable=False)
+    author_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(200), nullable=False)
     upvote = db.Column(db.Integer, default=0) # TODO(zack): Replace with upvote database model
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
@@ -41,6 +41,16 @@ class Post(db.Model):
 
     # Relation with topic
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
+    upvoteposts = db.relationship('UpvotePost', backref='posts', lazy=True)
+
+class UpvotePost(db.Model):
+    __tablename__= 'upvoteposts'
+
+    #TODO(zack): Determine what we'll choose for the vote_choice. What type of value do we want to use?
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, nullable=False)
+    post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
+    vote_choice = db.Column(db.Integer, nullable=False)
 
 class Report(db.Model):
     __tablename__ = 'reports'
