@@ -13,7 +13,7 @@ subjects_schema = SubjectSchema(many=True)
 class TopicSchema(ma.ModelSchema):
     class Meta:
         model = Topic
-        fields = ('subject', 'description', 'id')
+        fields = ('topic', 'description', 'id')
 
 topic_schema = TopicSchema()
 topics_schema = TopicSchema(many=True)
@@ -22,7 +22,7 @@ topics_schema = TopicSchema(many=True)
 class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
-        fields = ('subject', 'description', 'id')
+        fields = ('resource', 'resource_url', 'description', 'id')
 
 post_schema = PostSchema()
 posts_schema = PostSchema(many=True)

@@ -20,7 +20,7 @@ class Topic(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
-    subject = db.Column(db.String(50), nullable=False)
+    topic = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=False)
 
     # Relation with subject and post
@@ -32,9 +32,10 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    subject = db.Column(db.String(50), nullable=False)
+    resource = db.Column(db.String(50), nullable=False)
+    resource_url = db.Column(db.String(2084), nullable=False)
     author_id = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(200), nullable=False)
+    description = db.Column(db.String(240), nullable=False)
     upvote = db.Column(db.Integer, default=0) # TODO(zack): Replace with upvote database model
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
