@@ -75,7 +75,7 @@ def _posttopic(subjectid):
         return jsonify(err.messages), 422
 
     # check for post already created
-    duplicatetopic = Topic.query.filter_by(subject=json_data['subject'].lower()).first()
+    duplicatetopic = Topic.query.filter_by(topic=json_data['topic'].lower()).first()
     if duplicatetopic:
         return jsonify({"message": "Duplicate post"}), 400
 
@@ -84,7 +84,7 @@ def _posttopic(subjectid):
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         topic = Topic(
-            subject=json_data['subject'].lower(),
+            topic=json_data['topic'].lower(),
             description=json_data['description'].lower(),
             author_id = user.id,
             subject_id = subjectid
@@ -115,17 +115,18 @@ def _postcreate(topicid):
         return jsonify(err.messages), 422
 
     # check for post already created
-    duplicatepost = Post.query.filter_by(subject=json_data['subject'].lower()).first()
+    duplicatepost = Post.query.filter_by(resource=json_data['resource'].lower()).first()
     if duplicatepost:
         return jsonify({"message": "Duplicate post"}), 400
 
 
-    #is this a valid subject
+    #is this a valid resource
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         post = Post(
-            subject=json_data['subject'].lower(),
+            resource=json_data['resource'].lower(),
+            resource_url=json_data['resource_url'].lower(),
             description=json_data['description'].lower(),
             author_id = user.id,
             topic_id = topicid,
@@ -137,9 +138,24 @@ def _postcreate(topicid):
     return jsonify({"message": "Fail"}), 400
 
 
-@blueprint.route('/<int:topicid>/post/', methods=['GET',])
-def _getpostall(topicid):
+@blueprint.route('/topic/<int:topicid>/post/', methods=['GET',])
+def _getpostalltopic(topicid):
     posts = Post.query.filter_by(topic_id=topicid).all()
+    result = posts_schema.dump(posts, many=True)
+    return jsonify({'posts': result})
+
+
+# TODO: Add a route that returns all topics for a given subject
+# @blueprint.route('/subject/<int:subjectid>/post/', methods=['GET',])
+# def _getpostalltopic(subjectid):
+#     posts = Post.query.filter_by(topic_id=subjectid).all()
+#     result = posts_schema.dump(posts, many=True)
+#     return jsonify({'posts': result})
+
+
+@blueprint.route('/all/post/', methods=['GET',])
+def _getpostall():
+    posts = Post.query.all()
     result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': result})
 
