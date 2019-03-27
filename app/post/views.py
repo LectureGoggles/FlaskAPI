@@ -138,9 +138,24 @@ def _postcreate(topicid):
     return jsonify({"message": "Fail"}), 400
 
 
-@blueprint.route('/<int:topicid>/post/', methods=['GET',])
-def _getpostall(topicid):
+@blueprint.route('/topic/<int:topicid>/post/', methods=['GET',])
+def _getpostalltopic(topicid):
     posts = Post.query.filter_by(topic_id=topicid).all()
+    result = posts_schema.dump(posts, many=True)
+    return jsonify({'posts': result})
+
+
+# TODO: Add a route that returns all topics for a given subject
+# @blueprint.route('/subject/<int:subjectid>/post/', methods=['GET',])
+# def _getpostalltopic(subjectid):
+#     posts = Post.query.filter_by(topic_id=subjectid).all()
+#     result = posts_schema.dump(posts, many=True)
+#     return jsonify({'posts': result})
+
+
+@blueprint.route('/all/post/', methods=['GET',])
+def _getpostall():
+    posts = Post.query.all()
     result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': result})
 

@@ -22,7 +22,7 @@ topics_schema = TopicSchema(many=True)
 class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
-        fields = ('resource', 'resource_url', 'description', 'id')
+        fields = ('resource', 'resource_url', 'description', 'id', 'created_at')
 
 post_schema = PostSchema()
 posts_schema = PostSchema(many=True)
