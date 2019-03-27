@@ -126,6 +126,7 @@ def _postcreate(topicid):
         user = User.query.filter_by(username=current_user).first()
         post = Post(
             resource=json_data['resource'].lower(),
+            resource_url=json_data['resource_url'].lower(),
             description=json_data['description'].lower(),
             author_id = user.id,
             topic_id = topicid,
