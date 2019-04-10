@@ -241,8 +241,8 @@ def _getpostvotes(postid):
     return jsonify({'reports': result})
 
 # We will want to only allow users with the role of admin for this
-@jwt_required
 @blueprint.route('/v1/vote/getAllVotes', methods=['GET',])
+@jwt_required
 def _getvotesall():
     votes = UpvotePost.query.all()
     result = upvotes_schema.dump(reports, many=True)
