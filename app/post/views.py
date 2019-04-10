@@ -16,7 +16,7 @@ from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
 blueprint = Blueprint('post', __name__)
 
 ### SUBJECT
-@blueprint.route('/subject/create', methods=['POST',])
+@blueprint.route('/v1/subject/createSubject', methods=['POST',])
 @jwt_required
 def _subjectcreate():
     
@@ -47,13 +47,13 @@ def _subjectcreate():
     
     return jsonify({"message": "Fail"}), 400
 
-@blueprint.route('/subject/', methods=['GET',])
+@blueprint.route('/v1/subject/getAll', methods=['GET',])
 def _getsubjectall():
     subjects = Subject.query.all()
     result = subjects_schema.dump(subjects, many=True)
     return jsonify({'subjects': result})
 
-@blueprint.route('/subject/search/<subjectstr>', methods=['GET',])
+@blueprint.route('/v1/subject/search/<subjectstr>', methods=['GET',])
 def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
@@ -64,7 +64,7 @@ def _getsubject(subjectstr):
 
 
 ### TOPIC
-@blueprint.route('/<int:subjectid>/topic/create', methods=['POST',])
+@blueprint.route('/v1/topic/createTopic/<int:subjectid>/', methods=['POST',])
 @jwt_required
 def _posttopic(subjectid):
     json_data = request.get_json()
@@ -95,7 +95,7 @@ def _posttopic(subjectid):
 
     return jsonify({"message": "Fail"}), 400
 
-@blueprint.route('/<int:subjectid>/topic/', methods=['GET',])
+@blueprint.route('/v1/topic/getTopics/<int:subjectid>/', methods=['GET',])
 def _gettopicall(subjectid):
 
     topics = Topic.query.filter_by(subject_id=subjectid).all()
@@ -103,7 +103,7 @@ def _gettopicall(subjectid):
     return jsonify({'topics': result})
 
 ### POST
-@blueprint.route('/<int:topicid>/post/create', methods=['POST',])
+@blueprint.route('/v1/post/createPost/<int:topicid>/', methods=['POST',])
 @jwt_required
 def _postcreate(topicid):
 
@@ -138,7 +138,7 @@ def _postcreate(topicid):
     return jsonify({"message": "Fail"}), 400
 
 
-@blueprint.route('/topic/<int:topicid>/post/', methods=['GET',])
+@blueprint.route('/v1/post/getTopic/<int:topicid>/', methods=['GET',])
 def _getpostalltopic(topicid):
     posts = Post.query.filter_by(topic_id=topicid).all()
     result = posts_schema.dump(posts, many=True)
@@ -153,16 +153,16 @@ def _getpostalltopic(topicid):
 #     return jsonify({'posts': result})
 
 
-@blueprint.route('/all/post/', methods=['GET',])
+@blueprint.route('/v1/post/getAll', methods=['GET',])
 def _getpostall():
     posts = Post.query.all()
-    result = posts_schema.dump(posts, many=True)
-    return jsonify({'posts': result})
+    posts_result = posts_schema.dump(posts, many=True)
+    return jsonify({'posts': posts_result})
 
 
 ### REPORTS
 
-@blueprint.route('/<int:postid>/report/', methods=['POST',])
+@blueprint.route('/v1/report/createReport/<int:postid>/', methods=['POST',])
 @jwt_optional
 def _createreport(postid):
     json_data = request.get_json()
@@ -196,20 +196,20 @@ def _createreport(postid):
 
     return jsonify({"message": "Fail"}), 400
 
-@blueprint.route('/<int:postid>/report/', methods=['GET',])
+@blueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
 def _getpostreports(postid):
     reports = Report.query.filter_by(reported_post_id=postid).all()
     result = reports_schema.dump(reports, many=True)
     return jsonify({'reports': result})
 
-@blueprint.route('/report/', methods=['GET',])
+@blueprint.route('/v1/report/getReports', methods=['GET',])
 def _getreportsall():
     reports = Report.query.all()
     result = reports_schema.dump(reports, many=True)
     return jsonify({'reports': result})
 
 ## UPVOTE POST
-@blueprint.route('/<int:postid>/vote/', methods=['POST',])
+@blueprint.route('/v1/vote/onPost/<int:postid>/', methods=['POST',])
 @jwt_required
 def _createvote(postid):
     json_data = request.get_json()
@@ -234,13 +234,15 @@ def _createvote(postid):
 
     return jsonify({"message": "Fail"}), 400
 
-@blueprint.route('/<int:postid>/vote/', methods=['GET',])
+@blueprint.route('/v1/<int:postid>/vote/', methods=['GET',])
 def _getpostvotes(postid):
     votes = UpvotePost.query.filter_by(post_id=postid).all()
     result = upvotes_schema.dump(votes, many=True)
     return jsonify({'reports': result})
 
-@blueprint.route('/vote/', methods=['GET',])
+# We will want to only allow users with the role of admin for this
+@jwt_required
+@blueprint.route('/v1/vote/getAllVotes', methods=['GET',])
 def _getvotesall():
     votes = UpvotePost.query.all()
     result = upvotes_schema.dump(reports, many=True)
