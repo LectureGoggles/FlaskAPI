@@ -117,3 +117,6 @@ dmypy.json
 
 # Database Migrations
 migrations/
+
+#VS code
+.vscode
