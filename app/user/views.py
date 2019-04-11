@@ -14,7 +14,7 @@ import datetime
 
 blueprint = Blueprint('user', __name__)
 
-@blueprint.route('/users/signup', methods=('POST', ))
+@blueprint.route('/v1/users/signup', methods=('POST', ))
 def _register_user():
 
     json_data = request.get_json()
@@ -49,7 +49,7 @@ def _get_user():
     return jsonify({'users': result})
 
 
-@blueprint.route('/users/login', methods=('POST', ))
+@blueprint.route('/v1/users/login', methods=('POST', ))
 def _login_user():
     form = LoginForm()
     user = User.query.filter_by(email=form.email.data).first()
@@ -69,7 +69,7 @@ def _login_user():
         'ContentType': 'application/json'
     }
 
-@blueprint.route('/users/refresh', methods=['POST'])
+@blueprint.route('/v1/users/refresh', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():
     current_user = get_jwt_identity()
@@ -77,7 +77,7 @@ def refresh():
     access_token = create_access_token(identity=current_user, expires_delta=expires)
     return jsonify(ret), 200
 
-@blueprint.route("/users/logout", methods=["GET"])
+@blueprint.route("/v1/users/logout", methods=["GET"])
 @jwt_required
 def _logout():
     """Logout the current user."""
@@ -87,7 +87,7 @@ def _logout():
     db.session.commit()
     logout_user()
 
-@blueprint.route("/users/auth", methods=["GET"])
+@blueprint.route("/v1/users/auth", methods=["GET"])
 @jwt_optional
 def _auth():
     current_user = get_jwt_identity()
