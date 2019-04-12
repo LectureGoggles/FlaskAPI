@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, url_for
 from config import Config
 from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt, ma
 
@@ -13,10 +13,14 @@ POSTGRES = {
     'port': '5432',
 }
 
+UPLOAD_FOLDER = 'image_folder'
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+    app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['DEBUG'] = False
 
     # Using an internal ip 10.0.3.4

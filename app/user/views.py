@@ -1,17 +1,20 @@
 # user/views.py
-from flask import Blueprint, request
+from flask import Blueprint, request, url_for
 from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
 from flask import jsonify, json, render_template, flash, redirect, request
 from flask_login import current_user, login_user, logout_user, login_required
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
 
 from app.extensions import db, login_manager, bcrypt
 from .forms import RegisterForm, LoginForm
 from .models import User
 from .schema import UserSchema, user_schema, users_schema
+import os
+
 
 import datetime
-
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 blueprint = Blueprint('user', __name__)
 
 @blueprint.route('/v1/users/signup', methods=('POST', ))
@@ -92,3 +95,26 @@ def _logout():
 def _auth():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+
+@blueprint.route("/v1/users/uploadAccountImage", methods=["POST"])
+@jwt_optional
+def _upload_image():
+    # check if the post request has the file part
+    # if 'file' not in request.files:
+    #     flash('No file part')
+    #     return jsonify({'message': 'No file part'}), 400
+    file = request.files['file']
+    # if user does not select file, browser also
+    # submit a empty part without filename
+    # if file.filename == '':
+    #     flash('No selected file')
+    #     return jsonify({'message': 'No selected file'}), 400
+    if file and allowed_file(file.filename):
+        filename = secure_filename(file.filename)
+        file.save(os.path.join("image_folder/", filename))
+        return jsonify({'message': True}), 200
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
