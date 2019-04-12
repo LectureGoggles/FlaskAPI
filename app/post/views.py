@@ -34,7 +34,7 @@ def _subjectcreate():
 
     # Check to see if subject exists
     current_user = get_jwt_identity()
-    if current_user:
+    if current_user is not None:
         user = User.query.filter_by(username=current_user).first()
         subject = Subject(
             subject=json_data['subject'].lower(),
@@ -43,22 +43,27 @@ def _subjectcreate():
         )
         db.session.add(subject)
         db.session.commit()
-        return jsonify({"message": "Success"}), 200
+        return jsonify(message=True,
+                       id=subject.id,
+                       name=subject.subject), 200
     
     return jsonify({"message": "Fail"}), 400
 
-@blueprint.route('/v1/subject/getAll', methods=['GET',])
+@blueprint.route('/v1/subject/getAll', methods=['GET'])
 def _getsubjectall():
     subjects = Subject.query.all()
     result = subjects_schema.dump(subjects, many=True)
     return jsonify({'subjects': result})
 
-@blueprint.route('/v1/subject/search/<subjectstr>', methods=['GET',])
+@blueprint.route('/v1/subject/search/<subjectstr>', methods=['GET'])
 def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
     if getsubject:
-        return jsonify(subject_id=getsubject.id, subject_name=getsubject.subject, subject_description=getsubject.description, success='True', code=200)
+        return jsonify(subject_id=getsubject.id, 
+                       subject_name=getsubject.subject, 
+                       subject_description=getsubject.description, 
+                       success='True', code=200)
     else:
         return jsonify({"message": "Subject does not found"}), 400
 
@@ -79,19 +84,21 @@ def _posttopic(subjectid):
     if duplicatetopic:
         return jsonify({"message": "Duplicate post"}), 400
 
-    #is this a valid subject
+    # is this a valid subject
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         topic = Topic(
             topic=json_data['topic'].lower(),
             description=json_data['description'].lower(),
-            author_id = user.id,
-            subject_id = subjectid
+            author_id=user.id,
+            subject_id=subjectid
         )
         db.session.add(topic)
         db.session.commit()
-        return jsonify({"message": "Success"}), 200
+        return jsonify(message=True,
+                       id=topic.id,
+                       name=topic.topic), 200
 
     return jsonify({"message": "Fail"}), 400
 
@@ -128,12 +135,13 @@ def _postcreate(topicid):
             resource=json_data['resource'].lower(),
             resource_url=json_data['resource_url'].lower(),
             description=json_data['description'].lower(),
-            author_id = user.id,
-            topic_id = topicid,
+            author_id=user.id,
+            topic_id=topicid,
         )
         db.session.add(post)
         db.session.commit()
-        return jsonify({"message": "Success"}), 200
+        return jsonify(message=True,
+                       id=post.id), 200
 
     return jsonify({"message": "Fail"}), 400
 

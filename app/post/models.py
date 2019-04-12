@@ -16,7 +16,7 @@ class Subject(db.Model):
     addresses = db.relationship('Topic', backref='subjects', lazy=True)
 
 class Topic(db.Model):
-    __tablename__= 'topics'
+    __tablename__ = 'topics'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
