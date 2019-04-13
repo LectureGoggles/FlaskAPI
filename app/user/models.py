@@ -21,8 +21,9 @@ class User(UserMixin, db.Model):
     firstname = db.Column(db.String(80), nullable=False)
     lastname = db.Column(db.String(80), nullable=False)
     password = db.Column(
-        db.Binary(60), nullable=False)  #TODO(zack): Add hashed/salt password
+        db.Binary(60), nullable=False)
     school = db.Column(db.String(80), nullable=False)
+    profile_image = db.Column(db.String(80), nullable=False, default="default.png")
     created_at = db.Column(
         db.DateTime, nullable=False, default=dt.datetime.utcnow)
     updated_at = db.Column(
