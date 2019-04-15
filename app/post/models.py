@@ -11,6 +11,7 @@ class Subject(db.Model):
     description = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+    subject_image = db.Column(db.String(80), nullable=False, default="default_subject.png")
 
     # Relation with topic
     addresses = db.relationship('Topic', backref='subjects', lazy=True)
@@ -22,6 +23,7 @@ class Topic(db.Model):
     author_id = db.Column(db.Integer)
     topic = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(200), nullable=False)
+    topic_image = db.Column(db.String(80), nullable=False, default="default_subject.jpg")
 
     # Relation with subject and post
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)

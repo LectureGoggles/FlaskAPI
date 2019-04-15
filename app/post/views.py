@@ -1,7 +1,8 @@
-from flask import Blueprint, request, redirect
+from flask import Blueprint, request, redirect, send_file
 from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity
 from flask import jsonify, json, render_template, flash, redirect, request
 from marshmallow import ValidationError
+from werkzeug.utils import secure_filename
 
 from app.extensions import db, login_manager, bcrypt
 from .forms import SubjectCreation, TopicCreation, PostCreation
@@ -12,8 +13,10 @@ from .schema import TopicSchema, topic_schema, topics_schema
 from .schema import PostSchema, post_schema, posts_schema
 from .schema import ReportSchema, report_schema, reports_schema
 from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
+import os
 
 postblueprint = Blueprint('post', __name__)
+ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 ### SUBJECT
 @postblueprint.route('/v1/subject/createSubject', methods=['POST',])
@@ -67,6 +70,49 @@ def _getsubject(subjectstr):
     else:
         return jsonify({"message": "Subject does not found"}), 400
 
+@postblueprint.route("/v1/subject/setSubjectImageOn/<int:subjectid>", methods=["POST"])
+@jwt_required
+def _set_subject_image(subjectid):
+
+    current_user = get_jwt_identity()
+
+    if current_user:
+        subject = Subject.query.filter_by(id=subjectid).first()
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return jsonify({'message': 'No file part'}), 400
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return jsonify({'message': 'No selected file'}), 400
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join("app/image_folder/", filename.lower()))
+            subject.subject_image = filename.lower()
+            db.session.commit()
+            return jsonify({'message': True}), 200
+
+    return json({'message': False}), 400
+
+@postblueprint.route("/v1/subject/getSubjectImageOn/<int:subjectid>", methods=["GET"])
+def _get_subject_image(subjectid):
+
+    subject = Subject.query.filter_by(id=subjectid).first()
+    if subject:
+        filename = secure_filename(subject.subject_image)
+        return send_file(os.path.join("image_folder/", filename)) 
+
+    return jsonify({'message': "No subject of id provided"}), 400
+
+def allowed_file(filename):
+    return '.' in filename and \
+        filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+
 
 ### TOPIC
 @postblueprint.route('/v1/topic/createTopic/<int:subjectid>/', methods=['POST',])
@@ -108,6 +154,43 @@ def _gettopicall(subjectid):
     topics = Topic.query.filter_by(subject_id=subjectid).all()
     result = topics_schema.dump(topics, many=True)
     return jsonify({'topics': result})
+
+@postblueprint.route("/v1/topic/setTopicImageOn/<int:topicid>", methods=["POST"])
+@jwt_required
+def _set_topic_image(topicid):
+
+    current_user = get_jwt_identity()
+
+    if current_user:
+        topic = Topic.query.filter_by(id=topicid).first()
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return jsonify({'message': 'No file part'}), 400
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return jsonify({'message': 'No selected file'}), 400
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join("app/image_folder/", filename.lower()))
+            topic.topic_image = filename.lower()
+            db.session.commit()
+            return jsonify({'message': True}), 200
+
+    return json({'message': False}), 400
+
+@postblueprint.route("/v1/topic/getTopicImageOn/<int:topicid>", methods=["GET"])
+def _get_topic_image(topicid):
+
+    topic = Topic.query.filter_by(id=topicid).first()
+    if topic:
+        filename = secure_filename(topic.topic_image)
+        return send_file(os.path.join("image_folder/", filename)) 
+
+    return jsonify({'message': "No topic of id provided"}), 400
 
 ### POST
 @postblueprint.route('/v1/post/createPost/<int:topicid>/', methods=['POST',])
