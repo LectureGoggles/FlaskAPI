@@ -137,6 +137,6 @@ def _get_image():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         filename = secure_filename(user.profile_image)
-        return send_file(os.path.join("image_folder/", filename))  # TODO(zack) probably shouldn't hard code name like this use app.config[UPLOAD_PATH]
+        return send_file(os.path.join("image_folder/", filename))
 
     return jsonify({'message': "Not a current jwt token"}), 400
