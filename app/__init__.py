@@ -3,7 +3,9 @@ from config import Config
 from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt, ma
 
 from app.user.models import User
-from app import user, post
+from app.user.views import userblueprint
+from app.post.views import postblueprint
+from os.path import join, dirname, realpath
 
 POSTGRES = {
     'user': 'admin',
@@ -13,7 +15,7 @@ POSTGRES = {
     'port': '5432',
 }
 
-UPLOAD_FOLDER = 'image_folder'
+UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'image_folder/')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
@@ -37,7 +39,7 @@ def create_app():
 
 def register_extensions(app, db):
     """Register Flask extensions."""
-    #cache.init_app(app)
+    # cache.init_app(app)
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
@@ -49,7 +51,7 @@ def register_extensions(app, db):
 def register_blueprints(app):
     """Register Flask blueprints."""
     origins = app.config.get('CORS_ORIGIN_WHITELIST', '*')
-    cors.init_app(user.views.blueprint, origins=origins)
-    cors.init_app(post.views.blueprint, origins=origins)
-    app.register_blueprint(post.views.blueprint)
-    app.register_blueprint(user.views.blueprint)
+    cors.init_app(userblueprint, origins=origins)
+    cors.init_app(postblueprint, origins=origins)
+    app.register_blueprint(postblueprint)
+    app.register_blueprint(userblueprint)
