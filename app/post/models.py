@@ -37,8 +37,10 @@ class Post(db.Model):
     author_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(240), nullable=False)
     upvote = db.Column(db.Integer, default=0) # TODO(zack): Replace with upvote database model
+    upvote_count = db.Column(db.Integer, default=0)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
+
 
     # Relation with topic
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)

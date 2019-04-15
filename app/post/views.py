@@ -217,7 +217,7 @@ def _getreportsall():
     return jsonify({'reports': result})
 
 ## UPVOTE POST
-@postblueprint.route('/v1/vote/onPost/<int:postid>/', methods=['POST',])
+@postblueprint.route('/v1/vote/onPost/<int:postid>/', methods=['POST'])
 @jwt_required
 def _createvote(postid):
     json_data = request.get_json()
@@ -230,6 +230,8 @@ def _createvote(postid):
     #is this a valid subject
     current_user = get_jwt_identity()
     if current_user:
+        current_post = Post.query.filter_by(id=postid).first()
+        current_post.upvote_count += json_data['vote_choice']
         user = User.query.filter_by(username=current_user).first()
         upvote = UpvotePost(
             vote_choice=json_data['vote_choice'],
@@ -242,14 +244,14 @@ def _createvote(postid):
 
     return jsonify({"message": "Fail"}), 400
 
-@postblueprint.route('/v1/<int:postid>/vote/', methods=['GET',])
+@postblueprint.route('/v1/<int:postid>/vote/', methods=['GET'])
 def _getpostvotes(postid):
     votes = UpvotePost.query.filter_by(post_id=postid).all()
     result = upvotes_schema.dump(votes, many=True)
     return jsonify({'reports': result})
 
 # We will want to only allow users with the role of admin for this
-@postblueprint.route('/v1/vote/getAllVotes', methods=['GET',])
+@postblueprint.route('/v1/vote/getAllVotes', methods=['GET'])
 @jwt_required
 def _getvotesall():
     votes = UpvotePost.query.all()
