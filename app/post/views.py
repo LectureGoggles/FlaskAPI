@@ -226,7 +226,8 @@ def _postcreate(topicid):
             author_name=_author_name.username,
             topic_name=_topic_name.topic,
             subject_name=_subject_name.subject,
-            subject_id=_subject_id.id
+            subject_id=_subject_id.id,
+            author_image=_author_name.profile_image,
 
         )
         db.session.add(post)

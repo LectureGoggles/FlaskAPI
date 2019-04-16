@@ -27,7 +27,7 @@ class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
         this_one = fields.Method("getThis")
-        fields = ('resource', 'resource_url', 'description', 'id', 'created_at', 'upvote_count', 'subject_name', 'author_name', 'topic_name', 'subject_id')
+        fields = ('resource', 'resource_url', 'description', 'id', 'created_at', 'upvote_count', 'subject_name', 'author_name', 'topic_name', 'subject_id', 'author_image', 'post_image')
 
 
 post_schema = PostSchema()

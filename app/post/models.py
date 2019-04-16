@@ -45,6 +45,7 @@ class Post(db.Model):
     upvote = db.Column(db.Integer, default=0)  # TODO(zack): Replace with upvote database model
     upvote_count = db.Column(db.Integer, default=0)
     post_image = db.Column(db.String(80), nullable=False, default="default_subject.jpg")
+    author_image = db.Column(db.String(80), nullable=False, default="default.png")
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
