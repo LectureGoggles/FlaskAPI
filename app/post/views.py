@@ -365,33 +365,79 @@ def _getreportsall():
     result = reports_schema.dump(reports, many=True)
     return jsonify({'reports': result})
 
-## UPVOTE POST
-@postblueprint.route('/v1/vote/onPost/<int:postid>/', methods=['POST'])
+## POST VOTING
+@postblueprint.route('/v1/vote/upvotePost/<int:postid>/', methods=['POST'])
 @jwt_required
-def _createvote(postid):
-    json_data = request.get_json()
-
-    try:
-        upvote_data = upvote_schema.load(json_data)
-    except ValidationError as err:
-        return jsonify(err.messages), 422
+def _upvote_post(postid):
 
     #is this a valid subject
     current_user = get_jwt_identity()
     if current_user:
-        current_post = Post.query.filter_by(id=postid).first()
-        current_post.upvote_count += json_data['vote_choice']
         user = User.query.filter_by(username=current_user).first()
-        upvote = UpvotePost(
-            vote_choice=json_data['vote_choice'],
-            post_id=postid,
-            user_id= user.id,
-        )
-        db.session.add(upvote)
-        db.session.commit()
-        return jsonify({"message": "Success"}), 200
+        upvote_post = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
+        # check if user has already upvoted post
+        if upvote_post:
+            # did he upvote or downvote
+            if upvote_post.vote_choice == 1:
+                return jsonify({"message": "User has already upvoted post"}), 400
+            else:
+                # this this user has created a downvote for this post. Change that downvote to an upvote
+                upvote_post.vote_choice = 1
+                current_post = Post.query.filter_by(id=postid).first()
+                current_post.upvote_count += 1
+                db.session.commit()
+                return jsonify({"message": "Success"}), 200
+        else:
+            # vote doesn't exist yet so create a upvote
+            current_post = Post.query.filter_by(id=postid).first()
+            current_post.upvote_count += 1
+            upvote = UpvotePost(
+                post_id=postid,
+                user_id=user.id,
+                vote_choice=1
+            )
+            db.session.add(upvote)
+            db.session.commit()
+            return jsonify({"message": "Success"}), 200
 
-    return jsonify({"message": "Fail"}), 400
+    return jsonify({"message": "Invalid current user token"}), 400
+
+@postblueprint.route('/v1/vote/downvotePost/<int:postid>/', methods=['POST'])
+@jwt_required
+def _downvote_post(postid):
+
+    #is this a valid subject
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        upvote_post = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
+        # check if user has already upvoted post
+        if upvote_post:
+            # did he upvote or downvote
+            if upvote_post.vote_choice == -1:
+                return jsonify({"message": "User has already downvoted post"}), 400
+            else:
+                # this this user has created an upvote for this post. Change that upvote to a downvote
+                upvote_post.vote_choice = -1
+                current_post = Post.query.filter_by(id=postid).first()
+                current_post.upvote_count -= 1
+                db.session.commit()
+                return jsonify({"message": "Success"}), 200
+
+        else:
+            # vote doesn't exist yet so create a upvote
+            current_post = Post.query.filter_by(id=postid).first()
+            current_post.upvote_count -= 1
+            upvote = UpvotePost(
+                post_id=postid,
+                user_id=user.id,
+                vote_choice=-1
+            )
+            db.session.add(upvote)
+            db.session.commit()
+            return jsonify({"message": "Success"}), 200
+
+    return jsonify({"message": "Invalid current user token"}), 400
 
 @postblueprint.route('/v1/<int:postid>/vote/', methods=['GET'])
 def _getpostvotes(postid):
