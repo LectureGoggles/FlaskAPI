@@ -37,12 +37,16 @@ class Post(db.Model):
     resource = db.Column(db.String(50), nullable=False)
     resource_url = db.Column(db.String(2084), nullable=False)
     author_id = db.Column(db.Integer, nullable=False)
+    author_name = db.Column(db.String(50), nullable=False)
+    subject_name = db.Column(db.String(50), nullable=False)
+    topic_name = db.Column(db.String(50), nullable=False)
+    subject_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(240), nullable=False)
-    upvote = db.Column(db.Integer, default=0) # TODO(zack): Replace with upvote database model
+    upvote = db.Column(db.Integer, default=0)  # TODO(zack): Replace with upvote database model
     upvote_count = db.Column(db.Integer, default=0)
+    post_image = db.Column(db.String(80), nullable=False, default="default_subject.jpg")
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-
 
     # Relation with topic
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
