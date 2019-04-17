@@ -293,14 +293,14 @@ def _get_post_all():
         votes = UpvotePost.query.filter_by(user_id=user.id).all()
 
         # return all posts and all user votes on post
-        posts = Post.query.all()
+        posts = Post.query.order_by(Post.upvote_count.desc()).all()
         posts_result = posts_schema.dump(posts, many=True)
         vote_status = upvote_schema.dump(votes, many=True)
         return jsonify(posts=posts_result, vote_status=vote_status)
 
 
     # no user token, return posts
-    posts = Post.query.all()
+    posts = Post.query.order_by(Post.upvote_count.desc()).all()
     posts_result = posts_schema.dump(posts, many=True)
     return jsonify(posts=posts_result)
 
@@ -361,7 +361,7 @@ def _getMyPosts():
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
-        posts = Post.query.filter_by(author_id=user.id).all()
+        posts = Post.query.order_by(Post.upvote_count.desc()).filter_by(author_id=user.id).all()
         posts_result = posts_schema.dump(posts, many=True)
         return jsonify({'posts': posts_result})
     return jsonify(message="invalid token"), 401
