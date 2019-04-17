@@ -329,9 +329,18 @@ def _deletepost(postid):
                 return jsonify(message="post deleted"), 200
             return jsonify(message="post id provided not found"), 400
         return jsonify(message="user did not create this post"), 400
-    return jsonify(message="not valid jwt token"), 400
+    return jsonify(message="not valid token"), 400
 
-    
+@postblueprint.route('/v1/post/getMyPosts', methods=['GET',])
+@jwt_required
+def _getMyPosts():
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        posts = Post.query.filter_by(author_id=user.id).all()
+        posts_result = posts_schema.dump(posts, many=True)
+        return jsonify({'posts': posts_result})
+    return jsonify(message="invalid token"), 401
 
 
 
