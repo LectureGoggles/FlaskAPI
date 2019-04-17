@@ -384,7 +384,7 @@ def _upvote_post(postid):
                 # this this user has created a downvote for this post. Change that downvote to an upvote
                 upvote_post.vote_choice = 1
                 current_post = Post.query.filter_by(id=postid).first()
-                current_post.upvote_count += 1
+                current_post.upvote_count += 2
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
         else:
@@ -420,7 +420,7 @@ def _downvote_post(postid):
                 # this this user has created an upvote for this post. Change that upvote to a downvote
                 upvote_post.vote_choice = -1
                 current_post = Post.query.filter_by(id=postid).first()
-                current_post.upvote_count -= 1
+                current_post.upvote_count -= 2
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
 
