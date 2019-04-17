@@ -282,13 +282,6 @@ def _get_post_image(postid):
 
     return jsonify({'message': "No topic of id provided"}), 400
 
-# TODO: Add a route that returns all topics for a given subject
-# @blueprint.route('/subject/<int:subjectid>/post/', methods=['GET',])
-# def _getpostalltopic(subjectid):
-#     posts = Post.query.filter_by(topic_id=subjectid).all()
-#     result = posts_schema.dump(posts, many=True)
-#     return jsonify({'posts': result})
-
 
 @postblueprint.route('/v1/post/getAll', methods=['GET',])
 def _getpostall():
@@ -296,10 +289,35 @@ def _getpostall():
     posts_result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': posts_result})
 
+
+@postblueprint.route('/v1/post/get/<int:postid>', methods=['GET'])
+@jwt_optional
+def _get_post_id(postid):
+
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        vote = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
+        if vote:  # Vote found for provided user
+            post = Post.query.filter_by(id=postid).first()
+            post_result = post_schema.dump(post)
+            vote_status = upvote_schema.dump(vote)
+            return jsonify(post=post_result, vote_status=vote_status)
+        # No vote found for provided user
+        post = Post.query.filter_by(id=postid).first()
+        post_result = post_schema.dump(post)
+        return jsonify({'post': post_result}, {'vote_status': "None"})
+
+    # No jwt provided
+    post = Post.query.filter_by(id=postid).first()
+    post_result = post_schema.dump(post)
+    return jsonify({'post': post_result})
+
+
 @postblueprint.route('/v1/post/deletePost/<int:postid>', methods=['POST'])
 @jwt_required
 def _deletepost(postid):
-    
+
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
@@ -390,7 +408,7 @@ def _upvote_post(postid):
                 current_post.upvote_count += 1
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
-            # this this user has created a downvote for this post. Change that downvote to an upvote
+            # this user has created a downvote for this post. Change that downvote to an upvote
             upvote_post.vote_choice = 1
             current_post = Post.query.filter_by(id=postid).first()
             current_post.upvote_count += 2
@@ -435,7 +453,7 @@ def _downvote_post(postid):
                 current_post.upvote_count -= 1
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
-            # this this user has created an upvote for this post. Change that upvote to a downvote
+            # this user has created an upvote for this post. Change that upvote to a downvote
             upvote_post.vote_choice = -1
             current_post = Post.query.filter_by(id=postid).first()
             current_post.upvote_count -= 2
@@ -457,7 +475,7 @@ def _downvote_post(postid):
 
     return jsonify({"message": "Invalid current user token"}), 400
 
-@postblueprint.route('/v1/<int:postid>/vote/', methods=['GET'])
+@postblueprint.route('/v1/vote/getVotesOnPost/<int:postid>', methods=['GET'])
 def _getpostvotes(postid):
     votes = UpvotePost.query.filter_by(post_id=postid).all()
     result = upvotes_schema.dump(votes, many=True)
