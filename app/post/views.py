@@ -379,14 +379,23 @@ def _upvote_post(postid):
         if upvote_post:
             # did he upvote or downvote
             if upvote_post.vote_choice == 1:
-                return jsonify({"message": "User has already upvoted post"}), 400
-            else:
-                # this this user has created a downvote for this post. Change that downvote to an upvote
+                upvote_post.vote_choice = 0
+                current_post = Post.query.filter_by(id=postid).first()
+                current_post.upvote_count -= 1
+                db.session.commit()
+                return jsonify({"message": "Success"}), 200
+            if upvote_post.vote_choice == 0:
                 upvote_post.vote_choice = 1
                 current_post = Post.query.filter_by(id=postid).first()
                 current_post.upvote_count += 1
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
+            # this this user has created a downvote for this post. Change that downvote to an upvote
+            upvote_post.vote_choice = 1
+            current_post = Post.query.filter_by(id=postid).first()
+            current_post.upvote_count += 2
+            db.session.commit()
+            return jsonify({"message": "Success"}), 200
         else:
             # vote doesn't exist yet so create a upvote
             current_post = Post.query.filter_by(id=postid).first()
@@ -415,14 +424,23 @@ def _downvote_post(postid):
         if upvote_post:
             # did he upvote or downvote
             if upvote_post.vote_choice == -1:
-                return jsonify({"message": "User has already downvoted post"}), 400
-            else:
-                # this this user has created an upvote for this post. Change that upvote to a downvote
-                upvote_post.vote_choice = -1
+                upvote_post.vote_choice = 0
+                current_post = Post.query.filter_by(id=postid).first()
+                current_post.upvote_count += 1
+                db.session.commit()
+                return jsonify({"message": "Success"}), 200
+            if upvote_post.vote_choice == 0:
+                upvote_post.vote_choice = 1
                 current_post = Post.query.filter_by(id=postid).first()
                 current_post.upvote_count -= 1
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
+            # this this user has created an upvote for this post. Change that upvote to a downvote
+            upvote_post.vote_choice = -1
+            current_post = Post.query.filter_by(id=postid).first()
+            current_post.upvote_count -= 2
+            db.session.commit()
+            return jsonify({"message": "Success"}), 200
 
         else:
             # vote doesn't exist yet so create a upvote
