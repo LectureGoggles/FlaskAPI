@@ -37,7 +37,7 @@ posts_schema = PostSchema(many=True)
 class UpvotePostSchema(ma.ModelSchema):
     class Meta:
         model = UpvotePost
-        fields = ('id', 'user_id', 'vote_choice')
+        fields = ('id', 'post_id', 'user_id', 'vote_choice')
 
 
 upvote_schema = UpvotePostSchema()
