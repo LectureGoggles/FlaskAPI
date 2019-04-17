@@ -19,7 +19,7 @@ postblueprint = Blueprint('post', __name__)
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 ### SUBJECT
-@postblueprint.route('/v1/subject/createSubject', methods=['POST',])
+@postblueprint.route('/v1/subject/createSubject/', methods=['POST',])
 @jwt_required
 def _subjectcreate():
     
@@ -52,13 +52,13 @@ def _subjectcreate():
     
     return jsonify({"message": "Fail"}), 400
 
-@postblueprint.route('/v1/subject/getAll', methods=['GET'])
+@postblueprint.route('/v1/subject/getAll/', methods=['GET'])
 def _getsubjectall():
     subjects = Subject.query.all()
     result = subjects_schema.dump(subjects, many=True)
     return jsonify({'subjects': result})
 
-@postblueprint.route('/v1/subject/search/<subjectstr>', methods=['GET'])
+@postblueprint.route('/v1/subject/search/<subjectstr>/', methods=['GET'])
 def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
@@ -70,7 +70,7 @@ def _getsubject(subjectstr):
     else:
         return jsonify({"message": "Subject does not found"}), 400
 
-@postblueprint.route("/v1/subject/setSubjectImageOn/<int:subjectid>", methods=["POST"])
+@postblueprint.route("/v1/subject/setSubjectImageOn/<int:subjectid>/", methods=["POST"])
 @jwt_required
 def _set_subject_image(subjectid):
 
@@ -97,7 +97,7 @@ def _set_subject_image(subjectid):
 
     return json({'message': False}), 400
 
-@postblueprint.route("/v1/subject/getSubjectImageOn/<int:subjectid>", methods=["GET"])
+@postblueprint.route("/v1/subject/getSubjectImageOn/<int:subjectid>/", methods=["GET"])
 def _get_subject_image(subjectid):
 
     subject = Subject.query.filter_by(id=subjectid).first()
@@ -155,7 +155,7 @@ def _gettopicall(subjectid):
     result = topics_schema.dump(topics, many=True)
     return jsonify({'topics': result})
 
-@postblueprint.route("/v1/topic/setTopicImageOn/<int:topicid>", methods=["POST"])
+@postblueprint.route("/v1/topic/setTopicImageOn/<int:topicid>/", methods=["POST"])
 @jwt_required
 def _set_topic_image(topicid):
 
@@ -182,7 +182,7 @@ def _set_topic_image(topicid):
 
     return json({'message': False}), 400
 
-@postblueprint.route("/v1/topic/getTopicImageOn/<int:topicid>", methods=["GET"])
+@postblueprint.route("/v1/topic/getTopicImageOn/<int:topicid>/", methods=["GET"])
 def _get_topic_image(topicid):
 
     topic = Topic.query.filter_by(id=topicid).first()
@@ -245,7 +245,7 @@ def _getpostalltopic(topicid):
     return jsonify({'posts': result})
 
 
-@postblueprint.route("/v1/post/setTopicImageOn/<int:postid>", methods=["POST"])
+@postblueprint.route("/v1/post/setTopicImageOn/<int:postid>/", methods=["POST"])
 @jwt_required
 def _set_post_image(postid):
 
@@ -272,7 +272,7 @@ def _set_post_image(postid):
 
     return json({'message': False}), 400
 
-@postblueprint.route("/v1/topic/getPostImageOn/<int:postid>", methods=["GET"])
+@postblueprint.route("/v1/topic/getPostImageOn/<int:postid>/", methods=["GET"])
 def _get_post_image(postid):
 
     post = Post.query.filter_by(id=postid).first()
@@ -283,7 +283,7 @@ def _get_post_image(postid):
     return jsonify({'message': "No topic of id provided"}), 400
 
 
-@postblueprint.route('/v1/post/getAll', methods=['GET',])
+@postblueprint.route('/v1/post/getAll/', methods=['GET',])
 @jwt_optional
 def _get_post_all():
 
@@ -309,7 +309,7 @@ def _get_post_int(postid):
     return 0
 
 
-@postblueprint.route('/v1/post/get/<int:postid>', methods=['GET'])
+@postblueprint.route('/v1/post/get/<int:postid>/', methods=['GET'])
 @jwt_optional
 def _get_post_id(postid):
 
@@ -333,7 +333,7 @@ def _get_post_id(postid):
     return jsonify({'posts': post_result})
 
 
-@postblueprint.route('/v1/post/deletePost/<int:postid>', methods=['POST'])
+@postblueprint.route('/v1/post/deletePost/<int:postid>/', methods=['POST'])
 @jwt_required
 def _deletepost(postid):
 
@@ -341,8 +341,12 @@ def _deletepost(postid):
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         post = Post.query.filter_by(id=postid).first()
+        upvotes = UpvotePost.query.filter_by(post_id=postid).all()
         if user.id == post.author_id:
             if post:
+                for upvote in upvotes:
+                    db.session.delete(upvote)
+                db.session.commit()
                 db.session.delete(post)
                 db.session.commit()
                 return jsonify(message="post deleted"), 200
@@ -350,8 +354,8 @@ def _deletepost(postid):
         return jsonify(message="user did not create this post"), 400
     return jsonify(message="not valid token"), 400
 
-  
-@postblueprint.route('/v1/post/getMyPosts', methods=['GET',])
+
+@postblueprint.route('/v1/post/getMyPosts/', methods=['GET',])
 @jwt_required
 def _getMyPosts():
     current_user = get_jwt_identity()
