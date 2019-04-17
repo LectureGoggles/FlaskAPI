@@ -282,19 +282,56 @@ def _get_post_image(postid):
 
     return jsonify({'message': "No topic of id provided"}), 400
 
-# TODO: Add a route that returns all topics for a given subject
-# @blueprint.route('/subject/<int:subjectid>/post/', methods=['GET',])
-# def _getpostalltopic(subjectid):
-#     posts = Post.query.filter_by(topic_id=subjectid).all()
-#     result = posts_schema.dump(posts, many=True)
-#     return jsonify({'posts': result})
-
 
 @postblueprint.route('/v1/post/getAll', methods=['GET',])
-def _getpostall():
+@jwt_optional
+def _get_post_all():
+
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        votes = UpvotePost.query.filter_by(user_id=user.id).all()
+
+        # return all posts and all user votes on post
+        posts = Post.query.all()
+        posts_result = posts_schema.dump(posts, many=True)
+        vote_status = upvote_schema.dump(votes, many=True)
+        return jsonify(post=posts_result, vote_status=vote_status)
+
+
+    # no user token, return posts
     posts = Post.query.all()
     posts_result = posts_schema.dump(posts, many=True)
-    return jsonify({'posts': posts_result})
+    return jsonify(post=posts_result)
+
+
+def _get_post_int(postid):
+    return 0
+
+
+@postblueprint.route('/v1/post/get/<int:postid>', methods=['GET'])
+@jwt_optional
+def _get_post_id(postid):
+
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        vote = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
+        if vote:  # Vote found for provided user
+            post = Post.query.filter_by(id=postid).first()
+            post_result = post_schema.dump(post)
+            vote_status = upvote_schema.dump(vote)
+            return jsonify(post=post_result, vote_status=vote_status)
+        # No vote found for provided user
+        post = Post.query.filter_by(id=postid).first()
+        post_result = post_schema.dump(post)
+        return jsonify({'post': post_result}, {'vote_status': "None"})
+
+    # No jwt provided
+    post = Post.query.filter_by(id=postid).first()
+    post_result = post_schema.dump(post)
+    return jsonify({'post': post_result})
+
 
 @postblueprint.route('/v1/post/deletePost/<int:postid>', methods=['POST'])
 @jwt_required
@@ -312,9 +349,6 @@ def _deletepost(postid):
             return jsonify(message="post id provided not found"), 400
         return jsonify(message="user did not create this post"), 400
     return jsonify(message="not valid jwt token"), 400
-
-    
-
 
 
 ### REPORTS
