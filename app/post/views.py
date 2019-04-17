@@ -296,13 +296,13 @@ def _get_post_all():
         posts = Post.query.all()
         posts_result = posts_schema.dump(posts, many=True)
         vote_status = upvote_schema.dump(votes, many=True)
-        return jsonify(post=posts_result, vote_status=vote_status)
+        return jsonify(posts=posts_result, vote_status=vote_status)
 
 
     # no user token, return posts
     posts = Post.query.all()
     posts_result = posts_schema.dump(posts, many=True)
-    return jsonify(post=posts_result)
+    return jsonify(posts=posts_result)
 
 
 def _get_post_int(postid):
@@ -318,19 +318,19 @@ def _get_post_id(postid):
         user = User.query.filter_by(username=current_user).first()
         vote = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
         if vote:  # Vote found for provided user
-            post = Post.query.filter_by(id=postid).first()
-            post_result = post_schema.dump(post)
+            posts = Post.query.filter_by(id=postid).first()
+            post_result = post_schema.dump(posts)
             vote_status = upvote_schema.dump(vote)
-            return jsonify(post=post_result, vote_status=vote_status)
+            return jsonify(posts=post_result, vote_status=vote_status)
         # No vote found for provided user
         post = Post.query.filter_by(id=postid).first()
         post_result = post_schema.dump(post)
-        return jsonify({'post': post_result}, {'vote_status': "None"})
+        return jsonify({'posts': post_result}, {'vote_status': "None"})
 
     # No jwt provided
     post = Post.query.filter_by(id=postid).first()
     post_result = post_schema.dump(post)
-    return jsonify({'post': post_result})
+    return jsonify({'posts': post_result})
 
 
 @postblueprint.route('/v1/post/deletePost/<int:postid>', methods=['POST'])
