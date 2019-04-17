@@ -333,31 +333,6 @@ def _get_post_id(postid):
     return jsonify({'post': post_result})
 
 
-
-@postblueprint.route('/v1/post/get/<int:postid>', methods=['GET'])
-@jwt_optional
-def _get_post_id(postid):
-
-    current_user = get_jwt_identity()
-    if current_user:
-        user = User.query.filter_by(username=current_user).first()
-        vote = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
-        if vote:  # Vote found for provided user
-            post = Post.query.filter_by(id=postid).first()
-            post_result = post_schema.dump(post)
-            vote_status = upvote_schema.dump(vote)
-            return jsonify(post=post_result, vote_status=vote_status)
-        # No vote found for provided user
-        post = Post.query.filter_by(id=postid).first()
-        post_result = post_schema.dump(post)
-        return jsonify({'post': post_result}, {'vote_status': "None"})
-
-    # No jwt provided
-    post = Post.query.filter_by(id=postid).first()
-    post_result = post_schema.dump(post)
-    return jsonify({'post': post_result})
-
-
 @postblueprint.route('/v1/post/deletePost/<int:postid>', methods=['POST'])
 @jwt_required
 def _deletepost(postid):
