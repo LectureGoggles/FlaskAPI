@@ -476,7 +476,7 @@ def _downvote_post(postid):
                 db.session.commit()
                 return jsonify({"message": "Success"}), 200
             if upvote_post.vote_choice == 0:
-                upvote_post.vote_choice = 1
+                upvote_post.vote_choice = -1
                 current_post = Post.query.filter_by(id=postid).first()
                 current_post.upvote_count -= 1
                 db.session.commit()
