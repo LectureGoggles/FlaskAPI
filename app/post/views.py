@@ -333,6 +333,7 @@ def _get_post_id(postid):
     return jsonify({'posts': post_result})
 
 
+
 @postblueprint.route('/v1/post/deletePost/<int:postid>/', methods=['POST'])
 @jwt_required
 def _deletepost(postid):
