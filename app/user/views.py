@@ -143,6 +143,45 @@ def _get_image():
 
     return jsonify({'message': "Invalid Token"}), 401
 
+@userblueprint.route("/v1/users/changePassword", methods=['POST'])
+@jwt_required
+def _change_password():
+
+    json_data = request.get_json()
+    
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        password = bcrypt.generate_password_hash(json_data['password'])
+        user.password = password
+        db.session.commit()
+        return jsonify(message="Chang password successful"), 200
+
+    return jsonify({'message': "Invalid Token"}), 401
+
+@userblueprint.route("/v1/users/changeEmail", methods=['POST'])
+@jwt_required
+def _change_email():
+    json_data = request.get_json()
+
+    if not json_data:
+        return jsonify({'message': 'No input data provided'}), 400
+
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        email = json_data['email']
+        user.email = email
+        db.session.commit()
+        return jsonify(message="Chang email successful"), 200
+
+    return jsonify({'message': "Invalid Token"}), 401
+
+
+
 ## SUBJECT SUBSCRIPTION
 @userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>", methods=['POST'])
 @jwt_required
@@ -160,7 +199,7 @@ def _subscribe_to_subject(subjectid):
         return jsonify(message=True,
                        id=subject_subscription.id,
                        user_id=user.id,
-                       subject_id=subject.id)
+                       subject_id=subject.id), 200
 
     return jsonify({'message': "Invalid Token"}), 401
 
@@ -189,7 +228,7 @@ def _subscribe_to_topic(topicid):
         return jsonify(message=True,
                        id=topic_subscription.id,
                        user_id=user.id,
-                       subject_id=topic.id)
+                       subject_id=topic.id), 200
 
     return jsonify({'message': "Invalid Token"}), 401
 
