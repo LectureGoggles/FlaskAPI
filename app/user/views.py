@@ -1,16 +1,18 @@
 # user/views.py
-from flask import Blueprint, request, url_for, send_file, jsonify, json, render_template, flash, redirect, send_from_directory
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, current_user, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
-from flask_login import current_user, login_user, logout_user, login_required
+from flask import Blueprint, request, send_file, jsonify, json, flash
+from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
-from app.extensions import db, login_manager, bcrypt
-from .forms import RegisterForm, LoginForm
-from .models import User
+from app.extensions import db, bcrypt
+from .forms import LoginForm
+from .models import User, Subject_Subscription, Topic_Subscription
+from app.post.models import Subject, Topic
 from .schema import UserSchema, user_schema, users_schema
+from .schema import SubjectSubscriptionSchema, subject_subscription_schema, subjects_subscription_schema
+from .schema import TopicSubscriptionSchema, topic_subscription_schema, topics_subscription_schema
+
 import os
-from os.path import realpath
 import datetime
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -85,10 +87,10 @@ def refresh():
 def _logout():
     """Logout the current user."""
     #Could use a blacklist to blacklist tokens but for now we'll wait TODO
-    user = current_user
-    db.session.add(user)
-    db.session.commit()
-    logout_user()
+    # user = current_user
+    # db.session.add(user)
+    # db.session.commit()
+    # logout_user()
 
 @userblueprint.route("/v1/users/auth", methods=["GET"])
 @jwt_optional
@@ -139,4 +141,60 @@ def _get_image():
         filename = secure_filename(user.profile_image)
         return send_file(os.path.join("image_folder/", filename))
 
-    return jsonify({'message': "Not a current jwt token"}), 400
+    return jsonify({'message': "Invalid Token"}), 401
+
+## SUBJECT SUBSCRIPTION
+@userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>", methods=['POST'])
+@jwt_required
+def _subscribe_to_subject(subjectid):
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        subject = Subject.query.filter_by(id=subjectid).first()
+        subject_subscription = Subject_Subscription(
+            user_id=user.id,
+            subject_id=subject.id
+        )
+        db.session.add(subject_subscription)
+        db.session.commit()
+        return jsonify(message=True,
+                       id=subject_subscription.id,
+                       user_id=user.id,
+                       subject_id=subject.id)
+
+    return jsonify({'message': "Invalid Token"}), 401
+
+
+@userblueprint.route('/v1/users/getAllSubjectSubscriptions', methods=['GET'])
+def _get_subject_subscriptions_all():
+    subject_subs = Subject_Subscription.query.all()
+    result = subjects_subscription_schema.dump(subject_subs, many=True)
+    return jsonify({'subject_subs': result}), 200
+
+
+## TOPIC SUBSCRIPTION
+@userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>", methods=['POST'])
+@jwt_required
+def _subscribe_to_topic(topicid):
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        topic = Topic.query.filter_by(id=topicid).first()
+        topic_subscription = Topic_Subscription(
+            user_id=user.id,
+            topic_id=topic.id
+        )
+        db.session.add(topic_subscription)
+        db.session.commit()
+        return jsonify(message=True,
+                       id=topic_subscription.id,
+                       user_id=user.id,
+                       subject_id=topic.id)
+
+    return jsonify({'message': "Invalid Token"}), 401
+
+@userblueprint.route('/v1/users/getAllTopicSubscriptions', methods=['GET'])
+def _get_topic_subscriptions_all():
+    topic_subs = Topic_Subscription.query.all()
+    result = topics_subscription_schema.dump(topic_subs, many=True)
+    return jsonify({'topic_subs': result}), 200
