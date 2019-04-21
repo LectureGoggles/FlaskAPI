@@ -371,7 +371,7 @@ def _getMyPosts():
 ### REPORTS
 
 @postblueprint.route('/v1/report/createReport/<int:postid>/', methods=['POST',])
-@jwt_optional
+@jwt_required
 def _createreport(postid):
     json_data = request.get_json()
 
