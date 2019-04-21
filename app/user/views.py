@@ -93,10 +93,22 @@ def _logout():
     # logout_user()
 
 @userblueprint.route("/v1/users/auth", methods=["GET"])
-@jwt_optional
+@jwt_required
 def _auth():
     current_user = get_jwt_identity()
-    return jsonify(logged_in_as=current_user), 200
+    user = User.query.filter_by(username=current_user).first()
+    def get_user(self):
+        data = {
+            'email': self.email,
+            'school': self.school,
+            'firstname': self.firstname,
+            'lastname': self.lastname
+        }
+        return data
+    if current_user:
+        user_info=get_user(user)
+        return jsonify(logged_in_as=current_user, user_info={'email': user.email,'school': user.school,'firstname': user.firstname,'lastname': user.lastname}), 200
+    return jsonify(logged_in_as=''), 200
 
 
 @userblueprint.route("/v1/users/setUserImage", methods=["POST"])
@@ -148,7 +160,7 @@ def _get_image():
 def _change_password():
 
     json_data = request.get_json()
-    
+
     if not json_data:
         return jsonify({'message': 'No input data provided'}), 400
 
