@@ -97,17 +97,12 @@ def _logout():
 def _auth():
     current_user = get_jwt_identity()
     user = User.query.filter_by(username=current_user).first()
-    def get_user(self):
-        data = {
-            'email': self.email,
-            'school': self.school,
-            'firstname': self.firstname,
-            'lastname': self.lastname
-        }
-        return data
     if current_user:
-        user_info=get_user(user)
-        return jsonify(logged_in_as=current_user, user_info={'email': user.email,'school': user.school,'firstname': user.firstname,'lastname': user.lastname}), 200
+        return jsonify(logged_in_as=current_user, user_info={'email': user.email,
+                    'school': user.school,
+                    'firstname': user.firstname,
+                    'lastname': user.lastname,
+                    'is_staff': user.is_staff}), 200
     return jsonify(logged_in_as=''), 200
 
 

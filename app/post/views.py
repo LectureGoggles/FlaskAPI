@@ -405,16 +405,31 @@ def _createreport(postid):
     return jsonify({"message": "Fail"}), 400
 
 @postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
+@jwt_required
 def _getpostreports(postid):
-    reports = Report.query.filter_by(reported_post_id=postid).all()
-    result = reports_schema.dump(reports, many=True)
-    return jsonify({'reports': result})
+    current_user = get_jwt_identity();
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            reports = Report.query.filter_by(reported_post_id=postid).all()
+            result = reports_schema.dump(reports, many=True)
+            return jsonify({'reports': result})
+    return jsonify('unauthorized'), 403
+
 
 @postblueprint.route('/v1/report/getReports', methods=['GET',])
+@jwt_required
 def _getreportsall():
-    reports = Report.query.all()
-    result = reports_schema.dump(reports, many=True)
-    return jsonify({'reports': result})
+    current_user = get_jwt_identity();
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            reports = Report.query.all()
+            result = reports_schema.dump(reports, many=True)
+            return jsonify({'reports': result})
+    return jsonify('unauthorized'), 403
 
 ## POST VOTING
 @postblueprint.route('/v1/vote/upvotePost/<int:postid>/', methods=['POST'])
