@@ -392,17 +392,7 @@ def _createreport(postid):
         db.session.add(report)
         db.session.commit()
         return jsonify({"message": "Success"}), 200
-    else:
-        user = User.query.filter_by(username=current_user).first()
-        report = Report(
-            description=json_data['description'].lower(),
-            reported_post_id=postid,
-        )
-        db.session.add(report)
-        db.session.commit()
-        return jsonify({"message": "Success"}), 200
-
-    return jsonify({"message": "Fail"}), 400
+    return jsonify({"message": "unauthorized"}), 403
 
 @postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
 @jwt_required
