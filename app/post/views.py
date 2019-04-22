@@ -343,7 +343,7 @@ def _deletepost(postid):
         user = User.query.filter_by(username=current_user).first()
         post = Post.query.filter_by(id=postid).first()
         upvotes = UpvotePost.query.filter_by(post_id=postid).all()
-        if user.id == post.author_id:
+        if user.id == post.author_id or user.is_staff:
             if post:
                 for upvote in upvotes:
                     db.session.delete(upvote)
