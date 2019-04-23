@@ -343,7 +343,7 @@ def _deletepost(postid):
         user = User.query.filter_by(username=current_user).first()
         post = Post.query.filter_by(id=postid).first()
         upvotes = UpvotePost.query.filter_by(post_id=postid).all()
-        if user.id == post.author_id:
+        if user.id == post.author_id or user.is_staff:
             if post:
                 for upvote in upvotes:
                     db.session.delete(upvote)
@@ -392,29 +392,34 @@ def _createreport(postid):
         db.session.add(report)
         db.session.commit()
         return jsonify({"message": "Success"}), 200
-    else:
-        user = User.query.filter_by(username=current_user).first()
-        report = Report(
-            description=json_data['description'].lower(),
-            reported_post_id=postid,
-        )
-        db.session.add(report)
-        db.session.commit()
-        return jsonify({"message": "Success"}), 200
-
-    return jsonify({"message": "Fail"}), 400
+    return jsonify({"message": "unauthorized"}), 403
 
 @postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
+@jwt_required
 def _getpostreports(postid):
-    reports = Report.query.filter_by(reported_post_id=postid).all()
-    result = reports_schema.dump(reports, many=True)
-    return jsonify({'reports': result})
+    current_user = get_jwt_identity();
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            reports = Report.query.filter_by(reported_post_id=postid).all()
+            result = reports_schema.dump(reports, many=True)
+            return jsonify({'reports': result})
+    return jsonify('unauthorized'), 403
+
 
 @postblueprint.route('/v1/report/getReports', methods=['GET',])
+@jwt_required
 def _getreportsall():
-    reports = Report.query.all()
-    result = reports_schema.dump(reports, many=True)
-    return jsonify({'reports': result})
+    current_user = get_jwt_identity();
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            reports = Report.query.all()
+            result = reports_schema.dump(reports, many=True)
+            return jsonify({'reports': result})
+    return jsonify('unauthorized'), 403
 
 ## POST VOTING
 @postblueprint.route('/v1/vote/upvotePost/<int:postid>/', methods=['POST'])
