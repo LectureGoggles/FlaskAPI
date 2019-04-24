@@ -58,6 +58,15 @@ def _getsubjectall():
     result = subjects_schema.dump(subjects, many=True)
     return jsonify({'subjects': result})
 
+
+@postblueprint.route('/v1/subject/getById/<int:subjectid>/', methods=['GET'])
+def _get_subject_by_id_(subjectid):
+    subject = Subject.query.filter_by(id=subjectid).first()
+    if (subject):
+        result = subjects_schema.dump(subject, many=False)
+        return jsonify({'subject': result})
+    return jsonify({'subject': None}), 404
+
 @postblueprint.route('/v1/subject/search/<subjectstr>/', methods=['GET'])
 def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
@@ -181,6 +190,19 @@ def _set_topic_image(topicid):
             return jsonify({'message': True}), 200
 
     return json({'message': False}), 400
+
+
+@postblueprint.route("/v1/topic/getById/<int:topicid>/", methods=["GET"])
+def _get_topic(topicid):
+    topic = Topic.query.filter_by(id=topicid).first()
+    if topic:
+        subject = Subject.query.filter_by(id=topic.subject_id).first()
+        if subject:
+            subject_result = subjects_schema.dump(subject, many=False)
+            topic_result = topics_schema.dump(topic, many=False)
+            return jsonify({'subject': subject_result[0], 'topic': topic_result[0]})
+    return jsonify('not found'), 404
+
 
 @postblueprint.route("/v1/topic/getTopicImageOn/<int:topicid>/", methods=["GET"])
 def _get_topic_image(topicid):

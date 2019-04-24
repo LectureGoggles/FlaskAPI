@@ -236,10 +236,28 @@ def _subscribe_to_subject(subjectid):
 
 
 @userblueprint.route('/v1/users/getAllSubjectSubscriptions', methods=['GET'])
+@jwt_required
 def _get_subject_subscriptions_all():
-    subject_subs = Subject_Subscription.query.all()
-    result = subjects_subscription_schema.dump(subject_subs, many=True)
-    return jsonify({'subject_subs': result}), 200
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            subject_subs = Subject_Subscription.query.all()
+            result = subjects_subscription_schema.dump(subject_subs, many=True)
+            return jsonify({'subject_subs': result}), 200
+    return jsonify('forbiden'), 403
+
+
+@userblueprint.route('/v1/users/getMySubjectSubscriptions/', methods=['GET'])
+@jwt_required
+def _get_user_subject_subscriptions():
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        subject_subs = Subject_Subscription.query.filter_by(user_id=user.id).all()
+        result = subjects_subscription_schema.dump(subject_subs, many=True)
+        return jsonify(result[0])
 
 
 ## TOPIC SUBSCRIPTION
@@ -275,14 +293,34 @@ def _subscribe_to_topic(topicid):
 
 
 @userblueprint.route('/v1/users/getAllTopicSubscriptions', methods=['GET'])
+@jwt_required
 def _get_topic_subscriptions_all():
-    topic_subs = Topic_Subscription.query.all()
-    result = topics_subscription_schema.dump(topic_subs, many=True)
-    return jsonify({'topic_subs': result}), 200
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            topic_subs = Topic_Subscription.query.all()
+            result = topics_subscription_schema.dump(topic_subs, many=True)
+            return jsonify({'topic_subs': result}), 200
+    return jsonify('forbiden'), 403
 
-@userblueprint.route('/v1/users/getTopicSubscription/<int:topicid>/', methods=['GET'])
+
+@userblueprint.route('/v1/users/getTopicSubscription/<int:topicid>/',
+                     methods=['GET'])
 @jwt_required
 def _get_topic_subscription(topicid):
     topic_sub = Topic_Subscription.query.filter_by(topic_id=topicid).first()
     result = topics_subscription_schema.dump(topic_sub, many=False)
     return jsonify(result[0])
+
+
+@userblueprint.route('/v1/users/getMyTopicSubscriptions/', methods=['GET'])
+@jwt_required
+def _get_user_topic_subscription():
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        topic_subs = Topic_Subscription.query.filter_by(user_id=user.id).all()
+        result = topics_subscription_schema.dump(topic_subs, many=True)
+        return jsonify(result[0])
