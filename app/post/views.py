@@ -535,14 +535,14 @@ def _downvote_post(postid):
 
     return jsonify({"message": "Invalid current user token"}), 400
 
-@postblueprint.route('/v1/vote/getVotesOnPost/<int:postid>', methods=['GET'])
+@postblueprint.route('/v1/vote/getVotesOnPost/<int:postid>/', methods=['GET'])
 def _getpostvotes(postid):
     votes = UpvotePost.query.filter_by(post_id=postid).all()
     result = upvotes_schema.dump(votes, many=True)
     return jsonify({'reports': result})
 
 # We will want to only allow users with the role of admin for this
-@postblueprint.route('/v1/vote/getAllVotes', methods=['GET'])
+@postblueprint.route('/v1/vote/getAllVotes/', methods=['GET'])
 @jwt_required
 def _getvotesall():
     votes = UpvotePost.query.all()
