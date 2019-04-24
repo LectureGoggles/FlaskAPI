@@ -241,7 +241,7 @@ def _postcreate(topicid):
         _subject_id = _subject_name
         post = Post(
             resource=json_data['resource'].lower(),
-            resource_url=json_data['resource_url'].lower(),
+            resource_url=json_data['resource_url'],
             description=json_data['description'].lower(),
             author_id=user.id,
             topic_id=topicid,
