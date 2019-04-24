@@ -20,7 +20,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 userblueprint = Blueprint('user', __name__)
 
 
-@userblueprint.route('/v1/users/signup', methods=('POST', ))
+@userblueprint.route('/v1/users/signup/', methods=('POST', ))
 def _register_user():
 
     json_data = request.get_json()
@@ -50,13 +50,19 @@ def _register_user():
 
 
 @userblueprint.route('/users/', methods=('GET', ))
+@jwt_required
 def _get_user():
-    users = User.query.all()
-    result = users_schema.dump(users, many=True)
-    return jsonify({'users': result})
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        if user.is_staff:
+            users = User.query.all()
+            result = users_schema.dump(users, many=True)
+            return jsonify({'users': result})
+    return jsonify('forbidden'), 403
 
 
-@userblueprint.route('/v1/users/login', methods=('POST', ))
+@userblueprint.route('/v1/users/login/', methods=('POST', ))
 def _login_user():
     form = LoginForm()
     user = User.query.filter_by(email=form.email.data).first()
@@ -80,7 +86,7 @@ def _login_user():
     }
 
 
-@userblueprint.route('/v1/users/refresh', methods=['POST'])
+@userblueprint.route('/v1/users/refresh/', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():
     current_user = get_jwt_identity()
@@ -90,7 +96,7 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-@userblueprint.route("/v1/users/logout", methods=["GET"])
+@userblueprint.route("/v1/users/logout/", methods=["GET"])
 @jwt_required
 def _logout():
     """Logout the current user."""
@@ -101,7 +107,7 @@ def _logout():
     # logout_user()
 
 
-@userblueprint.route("/v1/users/auth", methods=["GET"])
+@userblueprint.route("/v1/users/auth/", methods=["GET"])
 @jwt_required
 def _auth():
     current_user = get_jwt_identity()
@@ -118,7 +124,7 @@ def _auth():
     return jsonify(logged_in_as=''), 200
 
 
-@userblueprint.route("/v1/users/setUserImage", methods=["POST"])
+@userblueprint.route("/v1/users/setUserImage/", methods=["POST"])
 @jwt_required
 def _set_image():
 
@@ -151,7 +157,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@userblueprint.route("/v1/users/getUserImage", methods=["GET"])
+@userblueprint.route("/v1/users/getUserImage/", methods=["GET"])
 @jwt_required
 def _get_image():
 
@@ -164,7 +170,7 @@ def _get_image():
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route("/v1/users/changePassword", methods=['POST'])
+@userblueprint.route("/v1/users/changePassword/", methods=['POST'])
 @jwt_required
 def _change_password():
 
@@ -184,7 +190,7 @@ def _change_password():
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route("/v1/users/changeEmail", methods=['POST'])
+@userblueprint.route("/v1/users/changeEmail/", methods=['POST'])
 @jwt_required
 def _change_email():
     json_data = request.get_json()
@@ -204,7 +210,7 @@ def _change_email():
 
 
 ## SUBJECT SUBSCRIPTION
-@userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>",
+@userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>/",
                      methods=['POST'])
 @jwt_required
 def _subscribe_to_subject(subjectid):
@@ -235,7 +241,7 @@ def _subscribe_to_subject(subjectid):
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route('/v1/users/getAllSubjectSubscriptions', methods=['GET'])
+@userblueprint.route('/v1/users/getAllSubjectSubscriptions/', methods=['GET'])
 @jwt_required
 def _get_subject_subscriptions_all():
     current_user = get_jwt_identity()
@@ -261,7 +267,7 @@ def _get_user_subject_subscriptions():
 
 
 ## TOPIC SUBSCRIPTION
-@userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>",
+@userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>/",
                      methods=['POST'])
 @jwt_required
 def _subscribe_to_topic(topicid):
@@ -292,7 +298,7 @@ def _subscribe_to_topic(topicid):
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route('/v1/users/getAllTopicSubscriptions', methods=['GET'])
+@userblueprint.route('/v1/users/getAllTopicSubscriptions/', methods=['GET'])
 @jwt_required
 def _get_topic_subscriptions_all():
     current_user = get_jwt_identity()
