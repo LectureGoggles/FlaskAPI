@@ -14,6 +14,7 @@ from .schema import PostSchema, post_schema, posts_schema
 from .schema import ReportSchema, report_schema, reports_schema
 from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
 import os
+from urllib.parse import urlparse
 
 postblueprint = Blueprint('post', __name__)
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -267,40 +268,35 @@ def _getpostalltopic(topicid):
     return jsonify({'posts': result})
 
 
-@postblueprint.route("/v1/post/setTopicImageOn/<int:postid>/", methods=["POST"])
+@postblueprint.route("/v1/post/setPostmageOn/<int:postid>/", methods=["POST"])
 @jwt_required
 def _set_post_image(postid):
 
     current_user = get_jwt_identity()
+    json_data = request.get_json()
 
     if current_user:
         post = Post.query.filter_by(id=postid).first()
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return jsonify({'message': 'No file part'}), 400
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return jsonify({'message': 'No selected file'}), 400
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join("app/image_folder/", filename.lower()))
-            post.post_image = filename.lower()
-            db.session.commit()
-            return jsonify({'message': True}), 200
-
-    return json({'message': False}), 400
+        if post:
+            print(urlparse(json_data['url']))
+            if (urlparse(json_data['url']).scheme == 'http' or urlparse(json_data['url']).scheme == 'https'):
+                post.post_image = json_data['url']
+                db.session.commit()
+                return jsonify('successfully changed image'), 200
+            if (json_data['url'] == ''):
+                post.post_image = 'Image.svg'
+                db.session.commit()
+                return jsonify('successfully changed image to default'), 200
+            return jsonify('invalid format'), 415
+        return jsonify('not found'), 404
+    return jsonify('forbidden'), 403
 
 @postblueprint.route("/v1/topic/getPostImageOn/<int:postid>/", methods=["GET"])
 def _get_post_image(postid):
 
     post = Post.query.filter_by(id=postid).first()
     if post:
-        filename = secure_filename(post.post_image)
-        return send_file(os.path.join("image_folder/", filename)) 
+        return jsonify({'url': post.post_image}), 200
 
     return jsonify({'message': "No topic of id provided"}), 400
 

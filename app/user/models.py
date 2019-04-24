@@ -22,7 +22,7 @@ class User(UserMixin, db.Model):
     lastname = db.Column(db.String(80), nullable=False)
     password = db.Column(db.Binary(60), nullable=False)
     school = db.Column(db.String(80), nullable=False)
-    profile_image = db.Column(db.String(80), nullable=False, default="default.png")
+    profile_image = db.Column(db.String(2084), nullable=False, default="Avatar.svg")
     created_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
