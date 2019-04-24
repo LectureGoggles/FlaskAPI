@@ -7,13 +7,14 @@ from werkzeug.utils import secure_filename
 from app.extensions import db, bcrypt
 from .forms import LoginForm
 from .models import User, Subject_Subscription, Topic_Subscription
-from app.post.models import Subject, Topic
+from app.post.models import Subject, Topic, Post
 from .schema import UserSchema, user_schema, users_schema
 from .schema import SubjectSubscriptionSchema, subject_subscription_schema, subjects_subscription_schema
 from .schema import TopicSubscriptionSchema, topic_subscription_schema, topics_subscription_schema
 
 import os
 import datetime
+from urllib.parse import urlparse
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
@@ -127,29 +128,52 @@ def _auth():
 @userblueprint.route("/v1/users/setUserImage/", methods=["POST"])
 @jwt_required
 def _set_image():
-
     current_user = get_jwt_identity()
+    json_data = request.get_json()
 
     if current_user:
         user = User.query.filter_by(username=current_user).first()
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return jsonify({'message': 'No file part'}), 400
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return jsonify({'message': 'No selected file'}), 400
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join("app/image_folder/", filename.lower()))
-            user.profile_image = filename.lower()
-            db.session.commit()
-            return jsonify({'message': True}), 200
+        if user:
+            if (urlparse(json_data['url']).scheme == 'http' or urlparse(json_data['url']).scheme == 'https'):
+                user.profile_image = json_data['url']
+                user_posts = Post.query.filter_by(author_id=user.id).all()
+                for user_post in user_posts:
+                    user_post.author_image = json_data['url']
+                db.session.commit()
+                return jsonify('successfully changed image'), 200
+            if (json_data['url'] == ''):
+                user.profile_image = 'Avatar.svg'
+                user_posts = Post.query.filter_by(author_id=user.id).all()
+                for user_post in user_posts:
+                    user_post.author_image = 'Avatar.svg'
+                db.session.commit()
+                return jsonify('successfully changed image to default'), 200
+            return jsonify('invalid format'), 415
+        return jsonify('not found'), 404
+    return jsonify('forbidden'), 403
 
-    return json({'message': False}), 400
+    # current_user = get_jwt_identity()
+
+    # if current_user:
+    #     user = User.query.filter_by(username=current_user).first()
+    #     # check if the post request has the file part
+    #     if 'file' not in request.files:
+    #         flash('No file part')
+    #         return jsonify({'message': 'No file part'}), 400
+    #     file = request.files['file']
+    #     # if user does not select file, browser also
+    #     # submit a empty part without filename
+    #     if file.filename == '':
+    #         flash('No selected file')
+    #         return jsonify({'message': 'No selected file'}), 400
+    #     if file and allowed_file(file.filename):
+    #         filename = secure_filename(file.filename)
+    #         file.save(os.path.join("app/image_folder/", filename.lower()))
+    #         user.profile_image = filename.lower()
+    #         db.session.commit()
+    #         return jsonify({'message': True}), 200
+
+    # return json({'message': False}), 400
 
 
 def allowed_file(filename):
