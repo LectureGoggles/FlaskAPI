@@ -7,20 +7,21 @@ from werkzeug.utils import secure_filename
 from app.extensions import db, bcrypt
 from .forms import LoginForm
 from .models import User, Subject_Subscription, Topic_Subscription
-from app.post.models import Subject, Topic
+from app.post.models import Subject, Topic, Post
 from .schema import UserSchema, user_schema, users_schema
 from .schema import SubjectSubscriptionSchema, subject_subscription_schema, subjects_subscription_schema
 from .schema import TopicSubscriptionSchema, topic_subscription_schema, topics_subscription_schema
 
 import os
 import datetime
+from urllib.parse import urlparse
 
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 userblueprint = Blueprint('user', __name__)
 
 
-@userblueprint.route('/v1/users/signup', methods=('POST', ))
+@userblueprint.route('/v1/users/signup/', methods=('POST', ))
 def _register_user():
 
     json_data = request.get_json()
@@ -50,13 +51,19 @@ def _register_user():
 
 
 @userblueprint.route('/users/', methods=('GET', ))
+@jwt_required
 def _get_user():
-    users = User.query.all()
-    result = users_schema.dump(users, many=True)
-    return jsonify({'users': result})
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        if user.is_staff:
+            users = User.query.all()
+            result = users_schema.dump(users, many=True)
+            return jsonify({'users': result})
+    return jsonify('forbidden'), 403
 
 
-@userblueprint.route('/v1/users/login', methods=('POST', ))
+@userblueprint.route('/v1/users/login/', methods=('POST', ))
 def _login_user():
     form = LoginForm()
     user = User.query.filter_by(email=form.email.data).first()
@@ -80,7 +87,7 @@ def _login_user():
     }
 
 
-@userblueprint.route('/v1/users/refresh', methods=['POST'])
+@userblueprint.route('/v1/users/refresh/', methods=['POST'])
 @jwt_refresh_token_required
 def refresh():
     current_user = get_jwt_identity()
@@ -90,7 +97,7 @@ def refresh():
     return jsonify(access_token=access_token), 200
 
 
-@userblueprint.route("/v1/users/logout", methods=["GET"])
+@userblueprint.route("/v1/users/logout/", methods=["GET"])
 @jwt_required
 def _logout():
     """Logout the current user."""
@@ -101,7 +108,7 @@ def _logout():
     # logout_user()
 
 
-@userblueprint.route("/v1/users/auth", methods=["GET"])
+@userblueprint.route("/v1/users/auth/", methods=["GET"])
 @jwt_required
 def _auth():
     current_user = get_jwt_identity()
@@ -118,32 +125,32 @@ def _auth():
     return jsonify(logged_in_as=''), 200
 
 
-@userblueprint.route("/v1/users/setUserImage", methods=["POST"])
+@userblueprint.route("/v1/users/setUserImage/", methods=["POST"])
 @jwt_required
 def _set_image():
-
     current_user = get_jwt_identity()
+    json_data = request.get_json()
 
     if current_user:
         user = User.query.filter_by(username=current_user).first()
-        # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return jsonify({'message': 'No file part'}), 400
-        file = request.files['file']
-        # if user does not select file, browser also
-        # submit a empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            return jsonify({'message': 'No selected file'}), 400
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join("app/image_folder/", filename.lower()))
-            user.profile_image = filename.lower()
-            db.session.commit()
-            return jsonify({'message': True}), 200
-
-    return json({'message': False}), 400
+        if user:
+            if (urlparse(json_data['url']).scheme == 'http' or urlparse(json_data['url']).scheme == 'https'):
+                user.profile_image = json_data['url']
+                user_posts = Post.query.filter_by(author_id=user.id).all()
+                for user_post in user_posts:
+                    user_post.author_image = json_data['url']
+                db.session.commit()
+                return jsonify('successfully changed image'), 200
+            if (json_data['url'] == ''):
+                user.profile_image = 'Avatar.svg'
+                user_posts = Post.query.filter_by(author_id=user.id).all()
+                for user_post in user_posts:
+                    user_post.author_image = 'Avatar.svg'
+                db.session.commit()
+                return jsonify('successfully changed image to default'), 200
+            return jsonify('invalid format'), 415
+        return jsonify('not found'), 404
+    return jsonify('forbidden'), 403
 
 
 def allowed_file(filename):
@@ -151,7 +158,7 @@ def allowed_file(filename):
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-@userblueprint.route("/v1/users/getUserImage", methods=["GET"])
+@userblueprint.route("/v1/users/getUserImage/", methods=["GET"])
 @jwt_required
 def _get_image():
 
@@ -164,7 +171,7 @@ def _get_image():
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route("/v1/users/changePassword", methods=['POST'])
+@userblueprint.route("/v1/users/changePassword/", methods=['POST'])
 @jwt_required
 def _change_password():
 
@@ -184,7 +191,7 @@ def _change_password():
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route("/v1/users/changeEmail", methods=['POST'])
+@userblueprint.route("/v1/users/changeEmail/", methods=['POST'])
 @jwt_required
 def _change_email():
     json_data = request.get_json()
@@ -204,7 +211,7 @@ def _change_email():
 
 
 ## SUBJECT SUBSCRIPTION
-@userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>",
+@userblueprint.route("/v1/users/subscribeToSubject/<int:subjectid>/",
                      methods=['POST'])
 @jwt_required
 def _subscribe_to_subject(subjectid):
@@ -235,7 +242,7 @@ def _subscribe_to_subject(subjectid):
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route('/v1/users/getAllSubjectSubscriptions', methods=['GET'])
+@userblueprint.route('/v1/users/getAllSubjectSubscriptions/', methods=['GET'])
 @jwt_required
 def _get_subject_subscriptions_all():
     current_user = get_jwt_identity()
@@ -261,7 +268,7 @@ def _get_user_subject_subscriptions():
 
 
 ## TOPIC SUBSCRIPTION
-@userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>",
+@userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>/",
                      methods=['POST'])
 @jwt_required
 def _subscribe_to_topic(topicid):
@@ -292,7 +299,7 @@ def _subscribe_to_topic(topicid):
     return jsonify({'message': "Invalid Token"}), 401
 
 
-@userblueprint.route('/v1/users/getAllTopicSubscriptions', methods=['GET'])
+@userblueprint.route('/v1/users/getAllTopicSubscriptions/', methods=['GET'])
 @jwt_required
 def _get_topic_subscriptions_all():
     current_user = get_jwt_identity()
