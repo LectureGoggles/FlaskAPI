@@ -152,29 +152,6 @@ def _set_image():
         return jsonify('not found'), 404
     return jsonify('forbidden'), 403
 
-    # current_user = get_jwt_identity()
-
-    # if current_user:
-    #     user = User.query.filter_by(username=current_user).first()
-    #     # check if the post request has the file part
-    #     if 'file' not in request.files:
-    #         flash('No file part')
-    #         return jsonify({'message': 'No file part'}), 400
-    #     file = request.files['file']
-    #     # if user does not select file, browser also
-    #     # submit a empty part without filename
-    #     if file.filename == '':
-    #         flash('No selected file')
-    #         return jsonify({'message': 'No selected file'}), 400
-    #     if file and allowed_file(file.filename):
-    #         filename = secure_filename(file.filename)
-    #         file.save(os.path.join("app/image_folder/", filename.lower()))
-    #         user.profile_image = filename.lower()
-    #         db.session.commit()
-    #         return jsonify({'message': True}), 200
-
-    # return json({'message': False}), 400
-
 
 def allowed_file(filename):
     return '.' in filename and \
