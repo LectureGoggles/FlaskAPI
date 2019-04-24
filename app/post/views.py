@@ -430,7 +430,7 @@ def _getpostreports(postid):
     return jsonify('unauthorized'), 403
 
 
-@postblueprint.route('/v1/report/getReports', methods=['GET',])
+@postblueprint.route('/v1/report/getReports/', methods=['GET',])
 @jwt_required
 def _getreportsall():
     current_user = get_jwt_identity();
