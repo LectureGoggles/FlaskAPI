@@ -388,8 +388,8 @@ def _getMyPosts():
   
 ### REPORTS
 
-@postblueprint.route('/v1/report/createReport/<int:postid>/', methods=['POST',])
-@jwt_required
+@postblueprint.route('/v1/report/createReport/', methods=['POST',])
+@jwt_optional
 def _createreport(postid):
     json_data = request.get_json()
 
@@ -398,38 +398,48 @@ def _createreport(postid):
     except ValidationError as err:
         return jsonify(err.messages), 422
 
-    #is this a valid subject
     current_user = get_jwt_identity()
+    # if valid jwt was given
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         report = Report(
-            description=json_data['description'].lower(),
-            reported_post_id=postid,
+            description=json_data['description'],
+            reported_content_extension=json_data['extension'],
             author_id=user.id,
         )
+        if user.is_teacher:
+            report.teacher_created = True
+        
         db.session.add(report)
         db.session.commit()
         return jsonify({"message": "Success"}), 200
+    else:
+        #jwt is optional
+        report = Report(
+            description=json_data['description'],
+            reported_content_extension=json_data['extension']
+        )
     return jsonify({"message": "unauthorized"}), 403
 
 @postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
 @jwt_required
 def _getpostreports(postid):
-    current_user = get_jwt_identity();
-    if current_user:
-        user = User.query.filter_by(username=current_user).first()
-        is_staff = user.is_staff
-        if is_staff:
-            reports = Report.query.filter_by(reported_post_id=postid).all()
-            result = reports_schema.dump(reports, many=True)
-            return jsonify({'reports': result})
-    return jsonify('unauthorized'), 403
+    # current_user = get_jwt_identity()
+    # if current_user:
+    #     user = User.query.filter_by(username=current_user).first()
+    #     is_staff = user.is_staff
+    #     if is_staff:
+    #         reports = Report.query.filter_by(reported_post_id=postid).all()
+    #         result = reports_schema.dump(reports, many=True)
+    #         return jsonify({'reports': result})
+    # return jsonify('unauthorized'), 403
+    return jsonify(message="This call has been deactivated due to changes to create report"), 400
 
 
 @postblueprint.route('/v1/report/getReports/', methods=['GET',])
 @jwt_required
 def _getreportsall():
-    current_user = get_jwt_identity();
+    current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         is_staff = user.is_staff

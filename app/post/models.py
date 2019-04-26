@@ -2,6 +2,7 @@ from flask_sqlalchemy import SQLAlchemy
 from app.extensions import db
 import datetime as dt
 
+
 class Subject(db.Model):
     __tablename__ = 'subjects'
 
@@ -15,6 +16,7 @@ class Subject(db.Model):
 
     # Relation with topic
     addresses = db.relationship('Topic', backref='subjects', lazy=True)
+
 
 class Topic(db.Model):
     __tablename__ = 'topics'
@@ -53,8 +55,9 @@ class Post(db.Model):
     topic_id = db.Column(db.Integer, db.ForeignKey('topics.id'), nullable=False)
     upvoteposts = db.relationship('UpvotePost', backref='posts', lazy=True)
 
+
 class UpvotePost(db.Model):
-    __tablename__= 'upvoteposts'
+    __tablename__ = 'upvoteposts'
 
     #TODO(zack): Determine what we'll choose for the vote_choice. What type of value do we want to use?
     id = db.Column(db.Integer, primary_key=True)
@@ -62,14 +65,26 @@ class UpvotePost(db.Model):
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
     vote_choice = db.Column(db.Integer, nullable=False)
 
+
 class Report(db.Model):
     __tablename__ = 'reports'
 
+    #TODO(zack): 
+    # Anyone can create a report but only staff can see it.
+    # Resolved should be a boolean
+    # TODO: Could be nice to keep track of the staff user who resolved the report
+
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.String(50))
-    reported_post_id = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(400), nullable=False)
+    description = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    resolved_by = db.Column(db.String(50), default="unresolved")
+    reported_content_extension = db.Column(db.String(100), nullable=False)
+    resolved = db.Column(db.Boolean, default=False)
+    resolved_by = db.Column(db.String(50), default="unsolved")
+    
+    teacher_created = db.Column(db.Boolean, default=False)
+
+
+    

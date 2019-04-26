@@ -47,7 +47,7 @@ def _register_user():
                 school=json_data['school'].lower())
     db.session.add(user)
     db.session.commit()
-    return jsonify("true")
+    return jsonify(message="Successful user creation", username=user.username)
 
 
 @userblueprint.route('/users/', methods=('GET', ))

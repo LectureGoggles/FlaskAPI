@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     created_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
     is_active = db.Column(db.Boolean, default=True)
+    is_teacher = db.Column(db.Boolean, default=False)
     is_staff = db.Column(db.Boolean, default=False)
 
     subject_subscriptions = db.relationship('Subject_Subscription', backref='users', lazy=True)
