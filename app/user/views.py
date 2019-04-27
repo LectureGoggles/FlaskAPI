@@ -50,6 +50,21 @@ def _register_user():
     return jsonify(message="Successful user creation", username=user.username)
 
 
+@userblueprint.route('/v1/users/delete/', methods=['POST'])
+@jwt_required
+def _delete_user():
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+
+        User.query.filter_by(id=user.id).delete()
+        #User.query.filter(User.id == 123).delete()
+        db.session.commit()
+        return jsonify(message="Successful account deletion"), 200
+    
+    return jsonify(message="Invalid token")
+
+
 @userblueprint.route('/users/', methods=('GET', ))
 @jwt_required
 def _get_user():
