@@ -8,7 +8,7 @@ class Subject(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
-    subject = db.Column(db.String(50), nullable=False)
+    subject = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
@@ -23,7 +23,7 @@ class Topic(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
-    topic = db.Column(db.String(50), nullable=False)
+    topic = db.Column(db.String(100), nullable=False)
     description = db.Column(db.String(200), nullable=False)
     topic_image = db.Column(db.String(80), nullable=False, default="default_subject.jpg")
 
@@ -36,14 +36,14 @@ class Post(db.Model):
     __tablename__ = 'posts'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    resource = db.Column(db.String(50), nullable=False)
+    resource = db.Column(db.String(100), nullable=False)
     resource_url = db.Column(db.String(2084), nullable=False)
     author_id = db.Column(db.Integer, nullable=False)
-    author_name = db.Column(db.String(50), nullable=False)
-    subject_name = db.Column(db.String(50), nullable=False)
-    topic_name = db.Column(db.String(50), nullable=False)
+    author_name = db.Column(db.String(100), nullable=False)
+    subject_name = db.Column(db.String(100), nullable=False)
+    topic_name = db.Column(db.String(100), nullable=False)
     subject_id = db.Column(db.Integer, nullable=False)
-    description = db.Column(db.String(240), nullable=False)
+    description = db.Column(db.String(400), nullable=False)
     upvote = db.Column(db.Integer, default=0)  # TODO(zack): Replace with upvote database model
     upvote_count = db.Column(db.Integer, default=0)
     post_image = db.Column(db.String(2084), nullable=False, default='Image.svg')
@@ -75,14 +75,14 @@ class Report(db.Model):
     # TODO: Could be nice to keep track of the staff user who resolved the report
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.String(50))
+    author_id = db.Column(db.String(100))
     description = db.Column(db.String(500))
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    reported_content_extension = db.Column(db.String(100), nullable=False)
+    reported_content_extension = db.Column(db.String(200), nullable=False)
     resolved = db.Column(db.Boolean, default=False)
-    resolved_by = db.Column(db.String(50), default="unsolved")
+    resolved_by = db.Column(db.String(100), default="unsolved")
     
     teacher_created = db.Column(db.Boolean, default=False)
 
