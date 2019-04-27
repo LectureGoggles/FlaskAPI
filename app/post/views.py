@@ -510,6 +510,8 @@ def _resolve_report(reportid):
             report = Report.query.filter_by(id=reportid).first()
             if report:
                 report.resolved = True
+                report.resolved_by = user.username
+                db.session.commit()
                 return jsonify(message="Report successfully resolved"), 200
     
     return jsonify('forbidden'), 403
