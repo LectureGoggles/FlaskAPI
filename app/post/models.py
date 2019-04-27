@@ -8,11 +8,11 @@ class Subject(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
-    subject = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
+    subject = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(250), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-    subject_image = db.Column(db.String(80), nullable=False, default="default_subject.png")
+    subject_image = db.Column(db.String(2084), nullable=False, default="default_subject.png")
 
     # Relation with topic
     addresses = db.relationship('Topic', backref='subjects', lazy=True)
@@ -23,9 +23,9 @@ class Topic(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer)
-    topic = db.Column(db.String(100), nullable=False)
-    description = db.Column(db.String(200), nullable=False)
-    topic_image = db.Column(db.String(80), nullable=False, default="default_subject.jpg")
+    topic = db.Column(db.String(50), nullable=False)
+    description = db.Column(db.String(250), nullable=False)
+    topic_image = db.Column(db.String(2084), nullable=False, default="default_subject.jpg")
 
     # Relation with subject and post
     subject_id = db.Column(db.Integer, db.ForeignKey('subjects.id'), nullable=False)
@@ -75,8 +75,8 @@ class Report(db.Model):
     # TODO: Could be nice to keep track of the staff user who resolved the report
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.String(100))
-    description = db.Column(db.String(500))
+    author_id = db.Column(db.Integer)
+    description = db.Column(db.String(250))
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
