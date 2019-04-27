@@ -261,8 +261,9 @@ def _postcreate(topicid):
     return jsonify({"message": "Fail"}), 400
 
 
-@postblueprint.route('/v1/post/getTopic/<int:topicid>/', methods=['GET',])
+@postblueprint.route('/v1/post/getTopic/<int:topicid>/', methods=['GET'])
 def _getpostalltopic(topicid):
+
     posts = Post.query.filter_by(topic_id=topicid).all()
     result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': result})
@@ -486,6 +487,7 @@ def _getpostreports(postid):
 @postblueprint.route('/v1/report/getReports/', methods=['GET'])
 @jwt_required
 def _getreportsall():
+
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
