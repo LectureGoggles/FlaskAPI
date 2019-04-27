@@ -80,7 +80,8 @@ class Report(db.Model):
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    reported_content_extension = db.Column(db.String(200), nullable=False)
+    reported_post_id = db.Column(db.Integer)
+    reported_content_extension = db.Column(db.String(200))
     resolved = db.Column(db.Boolean, default=False)
     resolved_by = db.Column(db.String(100), default="unsolved")
     
