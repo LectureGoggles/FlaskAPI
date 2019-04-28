@@ -47,7 +47,22 @@ def _register_user():
                 school=json_data['school'].lower())
     db.session.add(user)
     db.session.commit()
-    return jsonify("true")
+    return jsonify(message="Successful user creation", username=user.username)
+
+
+@userblueprint.route('/v1/users/delete/', methods=['POST'])
+@jwt_required
+def _delete_user():
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+
+        User.query.filter_by(id=user.id).delete()
+        #User.query.filter(User.id == 123).delete()
+        db.session.commit()
+        return jsonify(message="Successful account deletion"), 200
+    
+    return jsonify(message="Invalid token")
 
 
 @userblueprint.route('/users/', methods=('GET', ))
@@ -253,7 +268,7 @@ def _get_subject_subscriptions_all():
             subject_subs = Subject_Subscription.query.all()
             result = subjects_subscription_schema.dump(subject_subs, many=True)
             return jsonify({'subject_subs': result}), 200
-    return jsonify('forbiden'), 403
+    return jsonify('forbidden'), 403
 
 
 @userblueprint.route('/v1/users/getMySubjectSubscriptions/', methods=['GET'])
@@ -310,7 +325,7 @@ def _get_topic_subscriptions_all():
             topic_subs = Topic_Subscription.query.all()
             result = topics_subscription_schema.dump(topic_subs, many=True)
             return jsonify({'topic_subs': result}), 200
-    return jsonify('forbiden'), 403
+    return jsonify('forbidden'), 403
 
 
 @userblueprint.route('/v1/users/getTopicSubscription/<int:topicid>/',

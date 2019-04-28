@@ -27,7 +27,7 @@ class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
         this_one = fields.Method("getThis")
-        fields = ('resource', 'resource_url', 'description', 'id', 'created_at', 'upvote_count', 'subject_name', 'author_name', 'topic_name', 'subject_id', 'author_image', 'post_image')
+        fields = ('resource', 'resource_url', 'description', 'id', 'created_at', 'upvote_count', 'subject_name', 'author_name', 'topic_name', 'subject_id', 'author_image', 'post_image', 'topic_id')
 
 
 post_schema = PostSchema()
@@ -47,7 +47,7 @@ upvotes_schema = UpvotePostSchema(many=True)
 class ReportSchema(ma.ModelSchema):
     class Meta:
         model = Report
-        fields = ('id', 'description', 'reported_post_id', 'author_id', 'resolved_by')
+        fields = ('id', 'description', 'reported_content_extension', 'author_id', 'resolved', 'resolved_by', 'teacher_created', 'created_at')
 
 
 report_schema = ReportSchema()

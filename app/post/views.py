@@ -261,8 +261,9 @@ def _postcreate(topicid):
     return jsonify({"message": "Fail"}), 400
 
 
-@postblueprint.route('/v1/post/getTopic/<int:topicid>/', methods=['GET',])
+@postblueprint.route('/v1/post/getTopic/<int:topicid>/', methods=['GET'])
 def _getpostalltopic(topicid):
+
     posts = Post.query.filter_by(topic_id=topicid).all()
     result = posts_schema.dump(posts, many=True)
     return jsonify({'posts': result})
@@ -388,34 +389,91 @@ def _getMyPosts():
   
 ### REPORTS
 
-@postblueprint.route('/v1/report/createReport/<int:postid>/', methods=['POST',])
-@jwt_required
-def _createreport(postid):
+@postblueprint.route('/v1/report/createReportGeneral/', methods=['POST'])
+@jwt_optional
+def _create_report_general():
     json_data = request.get_json()
 
     try:
         report_data = report_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
+    
+    # Validate passed extension information
+    reported_extension = json_data['extension']
 
-    #is this a valid subject
+    if reported_extension[0] == '/':
+        if reported_extension[len(reported_extension)-1]:
+            print()
+        else:
+            return jsonify(message="invalid extension, make sure the last letter is '/'"), 400
+    else:
+        return jsonify(message="invalid extension, make sure the first letter is '/'"), 400
+
     current_user = get_jwt_identity()
+    # if valid jwt was given
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         report = Report(
-            description=json_data['description'].lower(),
+            description=json_data['description'],
+            reported_content_extension=json_data['extension'],
+            author_id=user.id,
+        )
+        if user.is_teacher:
+            report.teacher_created = True
+        
+        db.session.add(report)
+        db.session.commit()
+        return jsonify(message="success"), 200
+    else:
+        #jwt is optional
+        report = Report(
+            description=json_data['description'],
+            reported_content_extension=json_data['extension']
+        )
+        return jsonify(message="success"), 200
+    return jsonify(message="unauthorized"), 403
+
+
+@postblueprint.route('/v1/report/createReportPost/<int:postid>/', methods=['POST'])
+@jwt_optional
+def _create_report_post(postid):
+    json_data = request.get_json()
+
+    try:
+        report_data = report_schema.load(json_data)
+    except ValidationError as err:
+        return jsonify(err.messages), 422
+    
+    current_user = get_jwt_identity()
+    # if valid jwt was given
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        report = Report(
+            description=json_data['description'],
             reported_post_id=postid,
             author_id=user.id,
         )
+        if user.is_teacher:
+            report.teacher_created = True
+        
         db.session.add(report)
         db.session.commit()
-        return jsonify({"message": "Success"}), 200
-    return jsonify({"message": "unauthorized"}), 403
+        return jsonify(message="success"), 200
+    else:
+        #jwt is optional
+        report = Report(
+            description=json_data['description'],
+            reported_post_id=postid
+        )
+        return jsonify(message="success"), 200
+    return jsonify(message="unauthorized"), 403
 
-@postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET',])
+
+@postblueprint.route('/v1/report/getPostReport/<int:postid>/', methods=['GET'])
 @jwt_required
 def _getpostreports(postid):
-    current_user = get_jwt_identity();
+    current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         is_staff = user.is_staff
@@ -426,18 +484,37 @@ def _getpostreports(postid):
     return jsonify('unauthorized'), 403
 
 
-@postblueprint.route('/v1/report/getReports/', methods=['GET',])
+@postblueprint.route('/v1/report/getReports/', methods=['GET'])
 @jwt_required
 def _getreportsall():
-    current_user = get_jwt_identity();
+
+    current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         is_staff = user.is_staff
         if is_staff:
-            reports = Report.query.all()
+            reports = Report.query.filter_by(resolved=False).all()
             result = reports_schema.dump(reports, many=True)
             return jsonify({'reports': result})
     return jsonify('unauthorized'), 403
+
+@postblueprint.route('/v1/report/resolveReport/<int:reportid>/', methods=['POST'])
+@jwt_required
+def _resolve_report(reportid):
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        is_staff = user.is_staff
+        if is_staff:
+            # check if report exists
+            report = Report.query.filter_by(id=reportid).first()
+            if report:
+                report.resolved = True
+                report.resolved_by = user.username
+                db.session.commit()
+                return jsonify(message="Report successfully resolved"), 200
+    
+    return jsonify('forbidden'), 403
 
 ## POST VOTING
 @postblueprint.route('/v1/vote/upvotePost/<int:postid>/', methods=['POST'])
