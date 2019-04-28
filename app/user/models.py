@@ -8,13 +8,6 @@ class User(UserMixin, db.Model):
 
     __tablename__ = 'users'
 
-    # Create a model of a user who is signing up for an account.
-    # This user should have a unique username and email.
-    # Their password will need to be hashed.
-    # Use a boolean is_active and is_staff for determining if user has been banned and is_staff for more access later.
-    # Also basic created_at to determine creation date.
-    # To determine if changes have been made to the account use updated_at
-    # The university they attend or (school)
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(320), unique=True, nullable=False)

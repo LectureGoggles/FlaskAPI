@@ -44,7 +44,7 @@ class Post(db.Model):
     topic_name = db.Column(db.String(100), nullable=False)
     subject_id = db.Column(db.Integer, nullable=False)
     description = db.Column(db.String(400), nullable=False)
-    upvote = db.Column(db.Integer, default=0)  # TODO(zack): Replace with upvote database model
+    upvote = db.Column(db.Integer, default=0)
     upvote_count = db.Column(db.Integer, default=0)
     post_image = db.Column(db.String(2084), nullable=False, default='Image.svg')
     author_image = db.Column(db.String(2084), nullable=False, default='Avatar.svg')
@@ -59,7 +59,6 @@ class Post(db.Model):
 class UpvotePost(db.Model):
     __tablename__ = 'upvoteposts'
 
-    #TODO(zack): Determine what we'll choose for the vote_choice. What type of value do we want to use?
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, nullable=False)
     post_id = db.Column(db.Integer, db.ForeignKey('posts.id'), nullable=False)
@@ -69,17 +68,11 @@ class UpvotePost(db.Model):
 class Report(db.Model):
     __tablename__ = 'reports'
 
-    #TODO(zack): 
-    # Anyone can create a report but only staff can see it.
-    # Resolved should be a boolean
-    # TODO: Could be nice to keep track of the staff user who resolved the report
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     author_id = db.Column(db.Integer, nullable=True)
     description = db.Column(db.String(250), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
-
     reported_post_id = db.Column(db.Integer, nullable=True)
     reported_content_extension = db.Column(db.String(200), nullable=True)
     resolved = db.Column(db.Boolean, default=False)

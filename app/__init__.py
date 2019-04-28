@@ -25,7 +25,6 @@ def create_app():
     app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
     app.config['DEBUG'] = False
 
-    # Using an internal ip 10.0.3.4
     # Database
     app.config[
         'SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
