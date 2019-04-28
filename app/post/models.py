@@ -7,7 +7,7 @@ class Subject(db.Model):
     __tablename__ = 'subjects'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.Integer)
+    author_id = db.Column(db.Integer, nullable=False)
     subject = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
@@ -22,7 +22,7 @@ class Topic(db.Model):
     __tablename__ = 'topics'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.Integer)
+    author_id = db.Column(db.Integer, nullable=False)
     topic = db.Column(db.String(50), nullable=False)
     description = db.Column(db.String(250), nullable=False)
     topic_image = db.Column(db.String(2084), nullable=False, default="default_subject.jpg")
@@ -75,13 +75,13 @@ class Report(db.Model):
     # TODO: Could be nice to keep track of the staff user who resolved the report
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    author_id = db.Column(db.Integer)
-    description = db.Column(db.String(250))
+    author_id = db.Column(db.Integer, nullable=True)
+    description = db.Column(db.String(250), nullable=False)
     created_at = db.Column(db.DateTime, default=dt.datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=dt.datetime.utcnow)
 
-    reported_post_id = db.Column(db.Integer)
-    reported_content_extension = db.Column(db.String(200))
+    reported_post_id = db.Column(db.Integer, nullable=True)
+    reported_content_extension = db.Column(db.String(200), nullable=True)
     resolved = db.Column(db.Boolean, default=False)
     resolved_by = db.Column(db.String(100), default="unsolved")
     
