@@ -61,7 +61,7 @@ def _delete_user():
         #User.query.filter(User.id == 123).delete()
         db.session.commit()
         return jsonify(message="Successful account deletion"), 200
-    
+
     return jsonify(message="Invalid token")
 
 
@@ -149,7 +149,8 @@ def _set_image():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         if user:
-            if (urlparse(json_data['url']).scheme == 'http' or urlparse(json_data['url']).scheme == 'https'):
+            if (urlparse(json_data['url']).scheme == 'http'
+                    or urlparse(json_data['url']).scheme == 'https'):
                 user.profile_image = json_data['url']
                 user_posts = Post.query.filter_by(author_id=user.id).all()
                 for user_post in user_posts:
@@ -277,7 +278,8 @@ def _get_user_subject_subscriptions():
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
-        subject_subs = Subject_Subscription.query.filter_by(user_id=user.id).all()
+        subject_subs = Subject_Subscription.query.filter_by(
+            user_id=user.id).all()
         result = subjects_subscription_schema.dump(subject_subs, many=True)
         return jsonify(result[0])
 
@@ -331,10 +333,35 @@ def _get_topic_subscriptions_all():
 @userblueprint.route('/v1/users/getTopicSubscription/<int:topicid>/',
                      methods=['GET'])
 @jwt_required
+def _get_all_topic_subscription(topicid):
+    '''Gets all of the users subscribed to the topic subscription if you are an admin'''
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        if user.is_staff:
+            topic_sub = Topic_Subscription.query.filter_by(
+                topic_id=topicid).first()
+            result = topics_subscription_schema.dump(topic_sub, many=False)
+            return jsonify(result[0])
+        return jsonify('unauthorized'), 403
+    return jsonify('unauthorized'), 401
+
+
+@userblueprint.route('/v1/users/getMyTopicSubscription/<int:topicid>/',
+                     methods=['GET'])
+@jwt_required
 def _get_topic_subscription(topicid):
-    topic_sub = Topic_Subscription.query.filter_by(topic_id=topicid).first()
-    result = topics_subscription_schema.dump(topic_sub, many=False)
-    return jsonify(result[0])
+    '''Given a topic id, return the subscription status of the topic'''
+    current_user = get_jwt_identity()
+    if current_user:
+        user = User.query.filter_by(username=current_user).first()
+        if user:
+            topic_sub = Topic_Subscription.query.filter_by(
+                topic_id=topicid, user_id=user.id).first()
+            result = topics_subscription_schema.dump(topic_sub, many=False)
+            return jsonify(result[0])
+        return jsonify('unauthorized'), 403
+    return jsonify('unauthorized'), 401
 
 
 @userblueprint.route('/v1/users/getMyTopicSubscriptions/', methods=['GET'])
