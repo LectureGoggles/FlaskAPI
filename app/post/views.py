@@ -435,7 +435,7 @@ def _create_report_general():
     return jsonify(message="unauthorized"), 403
 
 
-@postblueprint.route('/v1/report/createReportPost/<int:postid>', methods=['POST'])
+@postblueprint.route('/v1/report/createReportPost/<int:postid>/', methods=['POST'])
 @jwt_optional
 def _create_report_post(postid):
     json_data = request.get_json()
@@ -498,7 +498,7 @@ def _getreportsall():
             return jsonify({'reports': result})
     return jsonify('unauthorized'), 403
 
-@postblueprint.route('/v1/report/resolveReport/<int:reportid>', methods=['POST'])
+@postblueprint.route('/v1/report/resolveReport/<int:reportid>/', methods=['POST'])
 @jwt_required
 def _resolve_report(reportid):
     current_user = get_jwt_identity()
