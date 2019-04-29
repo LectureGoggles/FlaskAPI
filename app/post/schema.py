@@ -47,7 +47,7 @@ upvotes_schema = UpvotePostSchema(many=True)
 class ReportSchema(ma.ModelSchema):
     class Meta:
         model = Report
-        fields = ('id', 'description', 'reported_content_extension', 'author_id', 'resolved', 'resolved_by', 'teacher_created', 'created_at')
+        fields = ('id', 'description', 'reported_content_extension', 'author_id', 'resolved', 'resolved_by', 'teacher_created', 'created_at', 'reported_post_id')
 
 
 report_schema = ReportSchema()
