@@ -30,7 +30,7 @@ def _register_user():
         return jsonify({'message': 'No input data provided'}), 400
 
     try:
-        user_data = user_schema.load(json_data)
+        user_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -45,6 +45,7 @@ def _register_user():
                 lastname=json_data['lastname'].lower(),
                 password=bcrypt.generate_password_hash(json_data['password']),
                 school=json_data['school'].lower())
+    user.is_teacher = json_data['is_teacher']
     db.session.add(user)
     db.session.commit()
     return jsonify(message="Successful user creation", username=user.username)
