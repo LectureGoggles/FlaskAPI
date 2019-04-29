@@ -386,7 +386,7 @@ def _getMyPosts():
         return jsonify({'posts': posts_result})
     return jsonify(message="invalid token"), 401
 
-  
+
 ### REPORTS
 
 @postblueprint.route('/v1/report/createReportGeneral/', methods=['POST'])
@@ -395,15 +395,15 @@ def _create_report_general():
     json_data = request.get_json()
 
     try:
-        report_data = report_schema.load(json_data)
+        report_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
-    
+
     # Validate passed extension information
     reported_extension = json_data['extension']
 
     if reported_extension[0] == '/':
-        if reported_extension[len(reported_extension)-1]:
+        if reported_extension[len(reported_extension)-1] == '/':
             print()
         else:
             return jsonify(message="invalid extension, make sure the last letter is '/'"), 400
@@ -421,16 +421,17 @@ def _create_report_general():
         )
         if user.is_teacher:
             report.teacher_created = True
-        
         db.session.add(report)
         db.session.commit()
         return jsonify(message="success"), 200
     else:
-        #jwt is optional
+        # jwt is optional
         report = Report(
             description=json_data['description'],
             reported_content_extension=json_data['extension']
         )
+        db.session.add(report)
+        db.session.commit()
         return jsonify(message="success"), 200
     return jsonify(message="unauthorized"), 403
 
@@ -441,10 +442,10 @@ def _create_report_post(postid):
     json_data = request.get_json()
 
     try:
-        report_data = report_schema.load(json_data)
+        report_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
-    
+
     current_user = get_jwt_identity()
     # if valid jwt was given
     if current_user:
@@ -456,12 +457,11 @@ def _create_report_post(postid):
         )
         if user.is_teacher:
             report.teacher_created = True
-        
         db.session.add(report)
         db.session.commit()
         return jsonify(message="success"), 200
     else:
-        #jwt is optional
+        # jwt is optional
         report = Report(
             description=json_data['description'],
             reported_post_id=postid
