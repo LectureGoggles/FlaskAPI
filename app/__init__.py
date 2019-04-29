@@ -6,14 +6,7 @@ from app.user.models import User
 from app.user.views import userblueprint
 from app.post.views import postblueprint
 from os.path import join, dirname, realpath
-
-POSTGRES = {
-    'user': 'admin',
-    'pw': 'password',
-    'db': 'mydb1',
-    'host': '127.0.0.1',
-    'port': '5432',
-}
+from envvariables import POSTGRES
 
 UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'image_folder/')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
