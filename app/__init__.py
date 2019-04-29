@@ -12,6 +12,7 @@ UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'image_folder/')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
@@ -47,3 +48,4 @@ def register_blueprints(app):
     cors.init_app(postblueprint, origins=origins)
     app.register_blueprint(postblueprint)
     app.register_blueprint(userblueprint)
+
