@@ -117,10 +117,31 @@ def _get_subject_image(subjectid):
 
     return jsonify({'message': "No subject of id provided"}), 400
 
+
 def allowed_file(filename):
     return '.' in filename and \
         filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+
+@postblueprint.route("/v1/subject/delete/<int:subjectid>/", methods=["GET"])
+@jwt_required
+def _delete_subject(subjectid):
+    current_user = get_jwt_identity()
+
+    if current_user:
+        #if current_user.is_staff:
+        topics = Topic.query.filter_by(subject_id=subjectid).all()
+        posts = Post.query.filter_by(subject_id=subjectid).all()
+        for post in posts:
+            db.session.delete(post)
+        for topic in topics:
+            db.session.delete(topic)
+            
+        subject = Subject.query.filter_by(id=subjectid).first()
+        db.session.delete(subject)
+        db.session.commit()
+        return jsonify({'message': True}), 200
+    return jsonify('forbidden'), 403
 
 
 
@@ -302,7 +323,7 @@ def _get_post_image(postid):
     return jsonify({'message': "No topic of id provided"}), 400
 
 
-@postblueprint.route('/v1/post/getAll/', methods=['GET',])
+@postblueprint.route('/v1/post/getAll/', methods=['GET'])
 @jwt_optional
 def _get_post_all():
 
