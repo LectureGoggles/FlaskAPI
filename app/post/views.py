@@ -129,7 +129,8 @@ def _delete_subject(subjectid):
     current_user = get_jwt_identity()
 
     if current_user:
-        if current_user.is_staff:
+        user = User.query.filter_by(username=current_user).first()
+        if user.is_staff:
             topics = Topic.query.filter_by(subject_id=subjectid).all()
             posts = Post.query.filter_by(subject_id=subjectid).all()
             for post in posts:
