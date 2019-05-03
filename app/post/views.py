@@ -129,18 +129,18 @@ def _delete_subject(subjectid):
     current_user = get_jwt_identity()
 
     if current_user:
-        #if current_user.is_staff:
-        topics = Topic.query.filter_by(subject_id=subjectid).all()
-        posts = Post.query.filter_by(subject_id=subjectid).all()
-        for post in posts:
-            db.session.delete(post)
-        for topic in topics:
-            db.session.delete(topic)
-            
-        subject = Subject.query.filter_by(id=subjectid).first()
-        db.session.delete(subject)
-        db.session.commit()
-        return jsonify({'message': True}), 200
+        if current_user.is_staff:
+            topics = Topic.query.filter_by(subject_id=subjectid).all()
+            posts = Post.query.filter_by(subject_id=subjectid).all()
+            for post in posts:
+                db.session.delete(post)
+            for topic in topics:
+                db.session.delete(topic)
+
+            subject = Subject.query.filter_by(id=subjectid).first()
+            db.session.delete(subject)
+            db.session.commit()
+            return jsonify({'message': True}), 200
     return jsonify('forbidden'), 403
 
 
