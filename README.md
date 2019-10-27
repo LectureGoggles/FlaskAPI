@@ -6,6 +6,7 @@
 python3 -m venv env
 source ./env/bin/activate
 pip install -r requirements.txt
-# TBD
 flask run
+--OR--
+gunicorn --bind=0.0.0.0 --timeout 600 app:create_app
 ```
