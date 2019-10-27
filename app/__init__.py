@@ -6,18 +6,18 @@ from app.user.models import User
 from app.user.views import userblueprint
 from app.post.views import postblueprint
 from os.path import join, dirname, realpath
+import os
 
 DB_INFO = {
-    'user' : os.environ["db_username"],
-    'pw' : os.environ["db_passwd"],
-    'db' : os.environ["db_name"],
-    'host' : os.environ["db_host"],
-    'port' : os.environ["db_port"],
+    'user': os.environ["db_username"],
+    'pw': os.environ["db_passwd"],
+    'db': os.environ["db_name"],
+    'host': os.environ["db_host"],
+    'port': os.environ["db_port"],
 }
 
 UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'image_folder/')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
-
 
 
 def create_app():
@@ -55,4 +55,3 @@ def register_blueprints(app):
     cors.init_app(postblueprint, origins=origins)
     app.register_blueprint(postblueprint)
     app.register_blueprint(userblueprint)
-
