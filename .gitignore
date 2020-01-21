@@ -119,5 +119,12 @@ dmypy.json
 # Database Migrations
 migrations/
 
-#VS code
-.vscode
+# editors
+*.swp
+.idea/
+.vs/
+.vscode/
+.DS_Store
+
+#security
+*.key
