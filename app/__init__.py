@@ -28,7 +28,10 @@ def create_app():
 
     # Database
     app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % DB_INFO
+        'SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % DB_INFO
+
+    print(app.config[
+        'SQLALCHEMY_DATABASE_URI'])
 
     # Function calls
     register_extensions(app, db)
