@@ -5,7 +5,7 @@ COPY . /app
 WORKDIR /app
 RUN pip3 install --upgrade pip
 RUN pip3 install -r requirements.txt
-RUN pip3 install uwsgi
+RUN pip3 install gunicorn
 
 ENV db_username=${db_username}
 ENV db_passwd=${db_passwd}
@@ -15,4 +15,4 @@ ENV db_port=${db_port}
 
 EXPOSE 80
 
-CMD ["uwsgi", "--ini", "conf/uwsgi.ini", "--die-on-term"]
+CMD ["gunicorn", "--bind", "0.0.0.0:80", "--timeout", "600", "autoapp:app"]
