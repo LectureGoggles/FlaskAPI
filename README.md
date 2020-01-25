@@ -6,6 +6,7 @@
 pipenv install
 pipenv run flask run
 # Using venv
+rm requirements.txt
 pipenv lock -r >> requirements.txt
 python3 -m venv env
 source ./env/bin/activate
