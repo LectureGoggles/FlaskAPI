@@ -1,9 +1,0 @@
-## REQUIREMENTS ##
-## RUNNING ##
-
-
-'''BASH
-$ git clone https://github.com/LectureGoggles/FlaskAPI.git
-$ cd FlaskAPI
-$ source env/bin/activate
-/FlaskAPI $ flask run

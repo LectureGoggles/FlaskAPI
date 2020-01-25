@@ -2,7 +2,11 @@
 
 ## How to run
 ```bash
-# Using python 3.6
+# Using pipenv
+pipenv install
+pipenv run flask run
+# Using venv
+pipenv lock -r >> requirements.txt
 python3 -m venv env
 source ./env/bin/activate
 pip install -r requirements.txt

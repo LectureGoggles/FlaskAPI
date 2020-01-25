@@ -4,6 +4,8 @@ LABEL maintainer="build@lecturegoggles.io"
 COPY . /app
 WORKDIR /app
 RUN pip3 install --upgrade pip
+RUN pip3 install pipenv
+RUN pipenv lock -r >> requirements.txt
 RUN pip3 install -r requirements.txt
 RUN pip3 install gunicorn
 
