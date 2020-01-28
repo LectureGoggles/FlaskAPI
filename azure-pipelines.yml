@@ -14,7 +14,7 @@ variables:
   imageRepository: 'lecturegogglesapi'
   containerRegistry: 'lecturegoggles.azurecr.io'
   dockerfilePath: '**/Dockerfile'
-  tag: '$(Build.BuildId)'
+  tag1: '$(Build.SourceBranchName)'
   
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
@@ -36,4 +36,4 @@ stages:
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
-          $(tag)
+          $(tag1)
