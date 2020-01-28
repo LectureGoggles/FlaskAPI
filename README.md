@@ -1,4 +1,17 @@
-# FlaskAPI
+# Lecture Goggles API
+
+![Lecture Goggles Logo](./LectureGogglesLargeLogo.svg)
+
+This repository contains all of the code for the API. Lecture Goggles is a
+free, open-source, educational resource repository to help students gain a better
+understanding of school subjects.
+
+## Build Status
+
+|Master|Development|
+|:-:|:-:|
+|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.lecture-goggles-api?branchName=master)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=1&branchName=master)|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.lecture-goggles-api?branchName=development)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=1&branchName=development)|
+
 
 ## How to run
 ```bash
