@@ -10,7 +10,7 @@ understanding of school subjects.
 
 |Master|Development|
 |:-:|:-:|
-|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.lecture-goggles-api?branchName=master)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=1&branchName=master)|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.lecture-goggles-api?branchName=development)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=1&branchName=development)|
+|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.FlaskAPI?branchName=master&jobName=Build)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=2&branchName=master)|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.FlaskAPI?branchName=development&jobName=Build)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=2&branchName=development)|
 
 
 ## How to run
