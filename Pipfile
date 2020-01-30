@@ -39,4 +39,4 @@ Werkzeug = "==0.15.3"
 WTForms = "==2.2.1"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
