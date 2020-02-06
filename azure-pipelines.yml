@@ -4,13 +4,14 @@
 
 trigger:
 - master
+- development
 
 resources:
 - repo: self
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '115e1af7-b5b9-42df-8f40-a6f0d1cf803c'
+  dockerRegistryServiceConnection: 'Lecture Goggles API Azure Container Registry'
   imageRepository: 'lecturegogglesapi'
   containerRegistry: 'lecturegoggles.azurecr.io'
   dockerfilePath: '**/Dockerfile'
@@ -35,5 +36,6 @@ stages:
         repository: $(imageRepository)
         dockerfile: $(dockerfilePath)
         containerRegistry: $(dockerRegistryServiceConnection)
+        addPipelineData: false
         tags: |
           $(tag1)
