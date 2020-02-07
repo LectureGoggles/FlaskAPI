@@ -1,5 +1,5 @@
 # build environment
-FROM python:3.6
+FROM python:3.7
 LABEL maintainer="build@lecturegoggles.io"
 COPY . /app
 WORKDIR /app
