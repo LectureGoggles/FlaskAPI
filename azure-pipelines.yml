@@ -5,6 +5,11 @@
 trigger:
 - master
 - development
+- feat/*
+- bug-fix/*
+- hot-fix/*
+- security/*
+- dependabot/*
 
 resources:
 - repo: self
