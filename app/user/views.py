@@ -282,8 +282,10 @@ def _get_user_subject_subscriptions():
         subject_subs = Subject_Subscription.query.filter_by(
             user_id=user.id).all()
         result = subjects_subscription_schema.dump(subject_subs, many=True)
-        return jsonify(result[0])
-
+        try:
+            return jsonify(result[0])
+        except:
+            return jsonify([])
 
 ## TOPIC SUBSCRIPTION
 @userblueprint.route("/v1/users/subscribeToTopic/<int:topicid>/",
@@ -343,7 +345,10 @@ def _get_all_topic_subscription(topicid):
             topic_sub = Topic_Subscription.query.filter_by(
                 topic_id=topicid).first()
             result = topics_subscription_schema.dump(topic_sub, many=False)
-            return jsonify(result[0])
+            try:
+                return jsonify(result[0])
+            except:
+                return jsonify([])
         return jsonify('unauthorized'), 403
     return jsonify('unauthorized'), 401
 
@@ -360,7 +365,10 @@ def _get_topic_subscription(topicid):
             topic_sub = Topic_Subscription.query.filter_by(
                 topic_id=topicid, user_id=user.id).first()
             result = topics_subscription_schema.dump(topic_sub, many=False)
-            return jsonify(result[0])
+            try:
+                return jsonify(result[0])
+            except:
+                return jsonify([])
         return jsonify('unauthorized'), 403
     return jsonify('unauthorized'), 401
 
@@ -373,4 +381,7 @@ def _get_user_topic_subscription():
         user = User.query.filter_by(username=current_user).first()
         topic_subs = Topic_Subscription.query.filter_by(user_id=user.id).all()
         result = topics_subscription_schema.dump(topic_subs, many=True)
-        return jsonify(result[0])
+        try:
+            return jsonify(result[0])
+        except:
+            return jsonify([])
