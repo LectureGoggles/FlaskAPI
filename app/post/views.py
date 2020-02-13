@@ -1,4 +1,4 @@
-from flask import Blueprint, request, send_file, jsonify, json, flash
+from flask import Blueprint, request, send_file, jsonify, flash
 from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
@@ -48,7 +48,7 @@ def _subjectcreate():
         return jsonify(message=True,
                        id=subject.id,
                        name=subject.subject), 200
-    
+
     return jsonify({"message": "Fail"}), 400
 
 @postblueprint.route('/v1/subject/getAll/', methods=['GET'])
@@ -111,7 +111,7 @@ def _get_subject_image(subjectid):
     subject = Subject.query.filter_by(id=subjectid).first()
     if subject:
         filename = secure_filename(subject.subject_image)
-        return send_file(os.path.join("image_folder/", filename)) 
+        return send_file(os.path.join("image_folder/", filename))
 
     return jsonify({'message': "No subject of id provided"}), 400
 
