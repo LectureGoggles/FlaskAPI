@@ -1,4 +1,4 @@
-from flask import Flask, url_for
+from flask import Flask
 from config import Config
 from app.extensions import db, migrate, cors, jwt, login_manager, bcrypt, ma
 
