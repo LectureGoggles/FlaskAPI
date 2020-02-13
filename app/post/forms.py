@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, Length, EqualTo, Email
+from wtforms import StringField
+from wtforms.validators import DataRequired, Length
 
 class TopicCreation(FlaskForm):
     topic = StringField("Topic Name", validators=[DataRequired(), Length(max=50)])
