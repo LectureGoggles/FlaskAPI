@@ -78,6 +78,3 @@ class Report(db.Model):
     resolved_by = db.Column(db.String(100), default="unsolved")
     
     teacher_created = db.Column(db.Boolean, default=False)
-
-
-    
