@@ -1,6 +1,6 @@
 # user/views.py
 from flask import Blueprint, request, send_file, jsonify, json, flash
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
+from flask_jwt_extended import jwt_required, create_access_token, get_jwt_identity, jwt_refresh_token_required, create_refresh_token
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
@@ -8,9 +8,9 @@ from app.extensions import db, bcrypt
 from .forms import LoginForm
 from .models import User, Subject_Subscription, Topic_Subscription
 from app.post.models import Subject, Topic, Post
-from .schema import UserSchema, user_schema, users_schema
-from .schema import SubjectSubscriptionSchema, subject_subscription_schema, subjects_subscription_schema
-from .schema import TopicSubscriptionSchema, topic_subscription_schema, topics_subscription_schema
+from .schema import user_schema, users_schema
+from .schema import subjects_subscription_schema
+from .schema import topics_subscription_schema
 
 import os
 import datetime
@@ -337,7 +337,7 @@ def _get_topic_subscriptions_all():
                      methods=['GET'])
 @jwt_required
 def _get_all_topic_subscription(topicid):
-    '''Gets all of the users subscribed to the topic subscription if you are an admin'''
+    """Gets all of the users subscribed to the topic subscription if you are an admin."""
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
@@ -357,7 +357,7 @@ def _get_all_topic_subscription(topicid):
                      methods=['GET'])
 @jwt_required
 def _get_topic_subscription(topicid):
-    '''Given a topic id, return the subscription status of the topic'''
+    """Given a topic id, return the subscription status of the topic."""
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()

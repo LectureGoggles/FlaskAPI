@@ -1,8 +1,7 @@
-from flask import Flask, request, url_for
+from flask import Flask
 from config import Config
-from app.extensions import db, migrate, cache, cors, jwt, login_manager, bcrypt, ma
+from app.extensions import db, migrate, cors, jwt, login_manager, bcrypt, ma
 
-from app.user.models import User
 from app.user.views import userblueprint
 from app.post.views import postblueprint
 from os.path import join, dirname, realpath

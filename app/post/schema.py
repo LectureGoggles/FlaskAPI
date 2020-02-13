@@ -1,6 +1,5 @@
 from app.extensions import ma
 from .models import Subject, Topic, Post, Report, UpvotePost
-from marshmallow import fields
 
 
 class SubjectSchema(ma.ModelSchema):
@@ -26,7 +25,6 @@ topics_schema = TopicSchema(many=True)
 class PostSchema(ma.ModelSchema):
     class Meta:
         model = Post
-        this_one = fields.Method("getThis")
         fields = ('resource', 'resource_url', 'description', 'id', 'created_at', 'upvote_count', 'subject_name', 'author_name', 'topic_name', 'subject_id', 'author_image', 'post_image', 'topic_id')
 
 

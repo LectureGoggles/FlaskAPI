@@ -1,4 +1,3 @@
-from flask_sqlalchemy import SQLAlchemy
 from app.extensions import db
 import datetime as dt
 
@@ -77,8 +76,4 @@ class Report(db.Model):
     reported_content_extension = db.Column(db.String(200), nullable=True)
     resolved = db.Column(db.Boolean, default=False)
     resolved_by = db.Column(db.String(100), default="unsolved")
-    
     teacher_created = db.Column(db.Boolean, default=False)
-
-
-    

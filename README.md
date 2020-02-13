@@ -12,8 +12,8 @@ understanding of school subjects.
 |:-:|:-:|
 |[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.FlaskAPI?branchName=master&jobName=Build)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=2&branchName=master)|[![Build Status](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_apis/build/status/LectureGoggles.FlaskAPI?branchName=development&jobName=Build)](https://dev.azure.com/lecturegoggles-devops/lecture-goggles-api/_build/latest?definitionId=2&branchName=development)|
 
-
 ## How to run
+
 ```bash
 # Using pipenv
 pipenv install
