@@ -1,18 +1,16 @@
-from flask import Blueprint, request, redirect, send_file
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity
-from flask import jsonify, json, render_template, flash, redirect, request
+from flask import Blueprint, request, send_file, jsonify, flash
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
-from app.extensions import db, login_manager, bcrypt
-from .forms import SubjectCreation, TopicCreation, PostCreation
+from app.extensions import db
 from .models import Subject, Topic, Post, Report, UpvotePost
 from app.user.models import User
-from .schema import SubjectSchema, subject_schema, subjects_schema
-from .schema import TopicSchema, topic_schema, topics_schema
-from .schema import PostSchema, post_schema, posts_schema
-from .schema import ReportSchema, report_schema, reports_schema
-from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
+from .schema import subject_schema, subjects_schema
+from .schema import topic_schema, topics_schema
+from .schema import post_schema, posts_schema
+from .schema import report_schema, reports_schema
+from .schema import upvote_schema, upvotes_schema
 import os
 from urllib.parse import urlparse
 
@@ -27,7 +25,7 @@ def _subjectcreate():
     json_data = request.get_json()
 
     try:
-        subject_data = subject_schema.load(json_data)
+        subject_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -50,7 +48,7 @@ def _subjectcreate():
         return jsonify(message=True,
                        id=subject.id,
                        name=subject.subject), 200
-    
+
     return jsonify({"message": "Fail"}), 400
 
 @postblueprint.route('/v1/subject/getAll/', methods=['GET'])
@@ -73,9 +71,9 @@ def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
     if getsubject:
-        return jsonify(subject_id=getsubject.id, 
-                       subject_name=getsubject.subject, 
-                       subject_description=getsubject.description, 
+        return jsonify(subject_id=getsubject.id,
+                       subject_name=getsubject.subject,
+                       subject_description=getsubject.description,
                        success='True', code=200)
     else:
         return jsonify({"message": "Subject does not found"}), 400
@@ -105,7 +103,7 @@ def _set_subject_image(subjectid):
             db.session.commit()
             return jsonify({'message': True}), 200
 
-    return json({'message': False}), 400
+    return jsonify({'message': False}), 400
 
 @postblueprint.route("/v1/subject/getSubjectImageOn/<int:subjectid>/", methods=["GET"])
 def _get_subject_image(subjectid):
@@ -113,7 +111,7 @@ def _get_subject_image(subjectid):
     subject = Subject.query.filter_by(id=subjectid).first()
     if subject:
         filename = secure_filename(subject.subject_image)
-        return send_file(os.path.join("image_folder/", filename)) 
+        return send_file(os.path.join("image_folder/", filename))
 
     return jsonify({'message': "No subject of id provided"}), 400
 
@@ -153,7 +151,7 @@ def _posttopic(subjectid):
     json_data = request.get_json()
 
     try:
-        topic_data = topic_schema.load(json_data)
+        topic_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -212,7 +210,7 @@ def _set_topic_image(topicid):
             db.session.commit()
             return jsonify({'message': True}), 200
 
-    return json({'message': False}), 400
+    return jsonify({'message': False}), 400
 
 
 @postblueprint.route("/v1/topic/getById/<int:topicid>/", methods=["GET"])
@@ -233,7 +231,7 @@ def _get_topic_image(topicid):
     topic = Topic.query.filter_by(id=topicid).first()
     if topic:
         filename = secure_filename(topic.topic_image)
-        return send_file(os.path.join("image_folder/", filename)) 
+        return send_file(os.path.join("image_folder/", filename))
 
     return jsonify({'message': "No topic of id provided"}), 400
 
@@ -245,7 +243,7 @@ def _postcreate(topicid):
     json_data = request.get_json()
 
     try:
-        post_data = post_schema.load(json_data)
+        post_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -535,7 +533,7 @@ def _resolve_report(reportid):
                 report.resolved_by = user.username
                 db.session.commit()
                 return jsonify(message="Report successfully resolved"), 200
-    
+
     return jsonify('forbidden'), 403
 
 ## POST VOTING
