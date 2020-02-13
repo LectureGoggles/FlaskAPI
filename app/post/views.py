@@ -71,9 +71,9 @@ def _getsubject(subjectstr):
     getsubject = Subject.query.filter_by(subject=subjectstr.lower()).first()
 
     if getsubject:
-        return jsonify(subject_id=getsubject.id, 
-                       subject_name=getsubject.subject, 
-                       subject_description=getsubject.description, 
+        return jsonify(subject_id=getsubject.id,
+                       subject_name=getsubject.subject,
+                       subject_description=getsubject.description,
                        success='True', code=200)
     else:
         return jsonify({"message": "Subject does not found"}), 400
@@ -210,7 +210,7 @@ def _set_topic_image(topicid):
             db.session.commit()
             return jsonify({'message': True}), 200
 
-    return json({'message': False}), 400
+    return jsonify({'message': False}), 400
 
 
 @postblueprint.route("/v1/topic/getById/<int:topicid>/", methods=["GET"])
@@ -231,7 +231,7 @@ def _get_topic_image(topicid):
     topic = Topic.query.filter_by(id=topicid).first()
     if topic:
         filename = secure_filename(topic.topic_image)
-        return send_file(os.path.join("image_folder/", filename)) 
+        return send_file(os.path.join("image_folder/", filename))
 
     return jsonify({'message': "No topic of id provided"}), 400
 
@@ -533,7 +533,7 @@ def _resolve_report(reportid):
                 report.resolved_by = user.username
                 db.session.commit()
                 return jsonify(message="Report successfully resolved"), 200
-    
+
     return jsonify('forbidden'), 403
 
 ## POST VOTING
