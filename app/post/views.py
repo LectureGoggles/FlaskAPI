@@ -3,15 +3,14 @@ from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, 
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
-from app.extensions import db, login_manager, bcrypt
-from .forms import SubjectCreation, TopicCreation, PostCreation
+from app.extensions import db, bcrypt
 from .models import Subject, Topic, Post, Report, UpvotePost
 from app.user.models import User
-from .schema import SubjectSchema, subject_schema, subjects_schema
-from .schema import TopicSchema, topic_schema, topics_schema
-from .schema import PostSchema, post_schema, posts_schema
-from .schema import ReportSchema, report_schema, reports_schema
-from .schema import UpvotePostSchema, upvote_schema, upvotes_schema
+from .schema import subject_schema, subjects_schema
+from .schema import topic_schema, topics_schema
+from .schema import post_schema, posts_schema
+from .schema import report_schema, reports_schema
+from .schema import upvote_schema, upvotes_schema
 import os
 from urllib.parse import urlparse
 
@@ -26,7 +25,7 @@ def _subjectcreate():
     json_data = request.get_json()
 
     try:
-        subject_data = subject_schema.load(json_data)
+        subject_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -152,7 +151,7 @@ def _posttopic(subjectid):
     json_data = request.get_json()
 
     try:
-        topic_data = topic_schema.load(json_data)
+        topic_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
@@ -244,7 +243,7 @@ def _postcreate(topicid):
     json_data = request.get_json()
 
     try:
-        post_data = post_schema.load(json_data)
+        post_schema.load(json_data)
     except ValidationError as err:
         return jsonify(err.messages), 422
 
