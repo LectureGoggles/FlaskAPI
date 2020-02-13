@@ -1,6 +1,5 @@
-from flask import Blueprint, request, redirect, send_file
+from flask import Blueprint, request, redirect, send_file, jsonify, json, render_template, flash
 from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity
-from flask import jsonify, json, render_template, flash, redirect, request
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
