@@ -337,7 +337,7 @@ def _get_topic_subscriptions_all():
                      methods=['GET'])
 @jwt_required
 def _get_all_topic_subscription(topicid):
-    '''Gets all of the users subscribed to the topic subscription if you are an admin.'''
+    """Gets all of the users subscribed to the topic subscription if you are an admin."""
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
@@ -357,7 +357,7 @@ def _get_all_topic_subscription(topicid):
                      methods=['GET'])
 @jwt_required
 def _get_topic_subscription(topicid):
-    '''Given a topic id, return the subscription status of the topic.'''
+    """Given a topic id, return the subscription status of the topic."""
     current_user = get_jwt_identity()
     if current_user:
         user = User.query.filter_by(username=current_user).first()
