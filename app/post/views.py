@@ -1,9 +1,9 @@
-from flask import Blueprint, request, redirect, send_file, jsonify, json, render_template, flash
-from flask_jwt_extended import jwt_required, jwt_optional, create_access_token, get_jwt_identity
+from flask import Blueprint, request, redirect, send_file, jsonify, json, flash
+from flask_jwt_extended import jwt_required, jwt_optional, get_jwt_identity
 from marshmallow import ValidationError
 from werkzeug.utils import secure_filename
 
-from app.extensions import db, bcrypt
+from app.extensions import db
 from .models import Subject, Topic, Post, Report, UpvotePost
 from app.user.models import User
 from .schema import subject_schema, subjects_schema
@@ -103,7 +103,7 @@ def _set_subject_image(subjectid):
             db.session.commit()
             return jsonify({'message': True}), 200
 
-    return json({'message': False}), 400
+    return jsonify({'message': False}), 400
 
 @postblueprint.route("/v1/subject/getSubjectImageOn/<int:subjectid>/", methods=["GET"])
 def _get_subject_image(subjectid):
