@@ -1,6 +1,5 @@
 from app.extensions import ma
 from .models import Subject, Topic, Post, Report, UpvotePost
-from marshmallow import fields
 
 
 class SubjectSchema(ma.ModelSchema):
