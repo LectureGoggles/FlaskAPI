@@ -3,7 +3,7 @@ from app import db
 import datetime
 
 class BaseModel(db.Model):
-    """Base data model for all objects"""
+    """Base data model for all objects."""
     __abstract__ = True
 
     def __init__(self, *args):
