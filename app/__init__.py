@@ -6,14 +6,9 @@ from app.user.views import userblueprint
 from app.post.views import postblueprint
 from os.path import join, dirname, realpath
 import os
+import urllib
 
-DB_INFO = {
-    'user': os.environ["db_username"],
-    'pw': os.environ["db_passwd"],
-    'db': os.environ["db_name"],
-    'host': os.environ["db_host"],
-    'port': os.environ["db_port"],
-}
+odbc_connection_string = urllib.parse.quote_plus(os.environ["ODBC_PARAMS"])
 
 UPLOAD_FOLDER = join(dirname(realpath(__file__)), 'image_folder/')
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -26,8 +21,7 @@ def create_app():
     app.config['DEBUG'] = False
 
     # Database
-    app.config[
-        'SQLALCHEMY_DATABASE_URI'] = 'postgresql+psycopg2://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % DB_INFO
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc:///?odbc_connect=%s' % odbc_connection_string
 
     # Function calls
     register_extensions(app, db)
