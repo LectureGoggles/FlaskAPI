@@ -203,7 +203,7 @@ def _change_password():
         password = bcrypt.generate_password_hash(json_data['password'])
         user.password = password
         db.session.commit()
-        return jsonify(message="Chang password successful"), 200
+        return jsonify(message="Change password successful"), 200
 
     return jsonify({'message': "Invalid Token"}), 401
 
