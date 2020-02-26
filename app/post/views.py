@@ -54,7 +54,11 @@ def _subjectcreate():
 @postblueprint.route('/v1/subject/getAll/', methods=['GET'])
 def _getsubjectall():
     subjects = Subject.query.all()
-    result = subjects_schema.dump(subjects, many=True)
+    dump = subjects_schema.dump(subjects, many=True)
+    # Super hacky, will be removed when front end is updated
+    result = list()
+    result.append(dump)
+    result.append(dict())
     return jsonify({'subjects': result})
 
 
