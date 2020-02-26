@@ -54,8 +54,8 @@ def _subjectcreate():
 @postblueprint.route('/v1/subject/getAll/', methods=['GET'])
 def _getsubjectall():
     subjects = Subject.query.all()
+    # HACK: Super hacky, will be removed when front end is updated
     dump = subjects_schema.dump(subjects, many=True)
-    # Super hacky, will be removed when front end is updated
     result = list()
     result.append(dump)
     result.append(dict())
@@ -66,7 +66,11 @@ def _getsubjectall():
 def _get_subject_by_id_(subjectid):
     subject = Subject.query.filter_by(id=subjectid).first()
     if (subject):
-        result = subjects_schema.dump(subject, many=False)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = subjects_schema.dump(subject, many=False)
+        result = list()
+        result.append(dump)
+        result.append(dict())
         return jsonify({'subject': result})
     return jsonify({'subject': None}), 404
 
@@ -186,7 +190,11 @@ def _posttopic(subjectid):
 def _gettopicall(subjectid):
 
     topics = Topic.query.filter_by(subject_id=subjectid).all()
-    result = topics_schema.dump(topics, many=True)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = topics_schema.dump(topics, many=True)
+    result = list()
+    result.append(dump)
+    result.append(dict())
     return jsonify({'topics': result})
 
 @postblueprint.route("/v1/topic/setTopicImageOn/<int:topicid>/", methods=["POST"])
@@ -223,8 +231,15 @@ def _get_topic(topicid):
     if topic:
         subject = Subject.query.filter_by(id=topic.subject_id).first()
         if subject:
-            subject_result = subjects_schema.dump(subject, many=False)
-            topic_result = topics_schema.dump(topic, many=False)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = subjects_schema.dump(subject, many=False)
+            subject_result = list()
+            subject_result.append(dump)
+            subject_result.append(dict())
+            dump = topics_schema.dump(topic, many=False)
+            topic_result = list()
+            topic_result.append(dump)
+            topic_result.append(dict())
             return jsonify({'subject': subject_result[0], 'topic': topic_result[0]})
     return jsonify('not found'), 404
 
@@ -289,7 +304,11 @@ def _postcreate(topicid):
 def _getpostalltopic(topicid):
 
     posts = Post.query.filter_by(topic_id=topicid).all()
-    result = posts_schema.dump(posts, many=True)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = posts_schema.dump(posts, many=True)
+    result = list()
+    result.append(dump)
+    result.append(dict())
     return jsonify({'posts': result})
 
 
@@ -337,14 +356,26 @@ def _get_post_all():
 
         # return all posts and all user votes on post
         posts = Post.query.order_by(Post.upvote_count.desc()).all()
-        posts_result = posts_schema.dump(posts, many=True)
-        vote_status = upvote_schema.dump(votes, many=True)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = posts_schema.dump(posts, many=True)
+        posts_result = list()
+        posts_result.append(dump)
+        posts_result.append(dict())
+        dump = upvote_schema.dump(votes, many=True)
+        vote_status = list()
+        vote_status.append(dump)
+        vote_status.append(dict())
+        
         return jsonify(posts=posts_result, vote_status=vote_status)
 
 
     # no user token, return posts
     posts = Post.query.order_by(Post.upvote_count.desc()).all()
-    posts_result = posts_schema.dump(posts, many=True)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = posts_schema.dump(posts, many=True)
+    posts_result = list()
+    posts_result.append(dump)
+    posts_result.append(dict())
     return jsonify(posts=posts_result)
 
 
@@ -362,17 +393,32 @@ def _get_post_id(postid):
         vote = UpvotePost.query.filter_by(user_id=user.id, post_id=postid).first()
         if vote:  # Vote found for provided user
             posts = Post.query.filter_by(id=postid).first()
-            post_result = post_schema.dump(posts)
-            vote_status = upvote_schema.dump(vote)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = post_schema.dump(posts)
+            post_result = list()
+            post_result.append(dump)
+            post_result.append(dict())
+            dump = upvote_schema.dump(vote)
+            vote_status = list()
+            vote_status.append(dump)
+            vote_status.append(dict())
             return jsonify(posts=post_result, vote_status=vote_status)
         # No vote found for provided user
         post = Post.query.filter_by(id=postid).first()
-        post_result = post_schema.dump(post)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = post_schema.dump(post)
+        post_result = list()
+        post_result.append(dump)
+        post_result.append(dict())
         return jsonify({'posts': post_result}, {'vote_status': "None"})
 
     # No jwt provided
     post = Post.query.filter_by(id=postid).first()
-    post_result = post_schema.dump(post)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = post_schema.dump(post)
+    post_result = list()
+    post_result.append(dump)
+    post_result.append(dict())
     return jsonify({'posts': post_result})
 
 
@@ -406,7 +452,11 @@ def _getMyPosts():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         posts = Post.query.order_by(Post.upvote_count.desc()).filter_by(author_id=user.id).all()
-        posts_result = posts_schema.dump(posts, many=True)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = posts_schema.dump(posts, many=True)
+        posts_result = list()
+        posts_result.append(dump)
+        posts_result.append(dict())
         return jsonify({'posts': posts_result})
     return jsonify(message="invalid token"), 401
 
@@ -503,7 +553,11 @@ def _getpostreports(postid):
         is_staff = user.is_staff
         if is_staff:
             reports = Report.query.filter_by(reported_post_id=postid).all()
-            result = reports_schema.dump(reports, many=True)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = reports_schema.dump(reports, many=True)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             return jsonify({'reports': result})
     return jsonify('unauthorized'), 403
 
@@ -518,7 +572,11 @@ def _getreportsall():
         is_staff = user.is_staff
         if is_staff:
             reports = Report.query.filter_by(resolved=False).all()
-            result = reports_schema.dump(reports, many=True)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = reports_schema.dump(reports, many=True)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             return jsonify({'reports': result})
     return jsonify('unauthorized'), 403
 
@@ -635,7 +693,11 @@ def _downvote_post(postid):
 @postblueprint.route('/v1/vote/getVotesOnPost/<int:postid>/', methods=['GET'])
 def _getpostvotes(postid):
     votes = UpvotePost.query.filter_by(post_id=postid).all()
-    result = upvotes_schema.dump(votes, many=True)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = upvotes_schema.dump(votes, many=True)
+    result = list()
+    result.append(dump)
+    result.append(dict())
     return jsonify({'reports': result})
 
 # We will want to only allow users with the role of admin for this
@@ -643,5 +705,9 @@ def _getpostvotes(postid):
 @jwt_required
 def _getvotesall():
     votes = UpvotePost.query.all()
-    result = upvotes_schema.dump(votes, many=True)
+    # HACK: Super hacky, will be removed when front end is updated
+    dump = upvotes_schema.dump(votes, many=True)
+    result = list()
+    result.append(dump)
+    result.append(dict())
     return jsonify({'votes': result})
