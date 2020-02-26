@@ -74,7 +74,11 @@ def _get_user():
         user = User.query.filter_by(username=current_user).first()
         if user.is_staff:
             users = User.query.all()
-            result = users_schema.dump(users, many=True)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = users_schema.dump(users, many=True)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             return jsonify({'users': result})
     return jsonify('forbidden'), 403
 
@@ -268,7 +272,11 @@ def _get_subject_subscriptions_all():
         is_staff = user.is_staff
         if is_staff:
             subject_subs = Subject_Subscription.query.all()
-            result = subjects_subscription_schema.dump(subject_subs, many=True)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = subjects_subscription_schema.dump(subject_subs, many=True)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             return jsonify({'subject_subs': result}), 200
     return jsonify('forbidden'), 403
 
@@ -281,7 +289,11 @@ def _get_user_subject_subscriptions():
         user = User.query.filter_by(username=current_user).first()
         subject_subs = Subject_Subscription.query.filter_by(
             user_id=user.id).all()
-        result = subjects_subscription_schema.dump(subject_subs, many=True)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = subjects_subscription_schema.dump(subject_subs, many=True)
+        result = list()
+        result.append(dump)
+        result.append(dict())
         try:
             return jsonify(result[0])
         except:
@@ -328,7 +340,11 @@ def _get_topic_subscriptions_all():
         is_staff = user.is_staff
         if is_staff:
             topic_subs = Topic_Subscription.query.all()
-            result = topics_subscription_schema.dump(topic_subs, many=True)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = topics_subscription_schema.dump(topic_subs, many=True)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             return jsonify({'topic_subs': result}), 200
     return jsonify('forbidden'), 403
 
@@ -344,7 +360,11 @@ def _get_all_topic_subscription(topicid):
         if user.is_staff:
             topic_sub = Topic_Subscription.query.filter_by(
                 topic_id=topicid).first()
-            result = topics_subscription_schema.dump(topic_sub, many=False)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = topics_subscription_schema.dump(topic_sub, many=False)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             try:
                 return jsonify(result[0])
             except:
@@ -364,7 +384,11 @@ def _get_topic_subscription(topicid):
         if user:
             topic_sub = Topic_Subscription.query.filter_by(
                 topic_id=topicid, user_id=user.id).first()
-            result = topics_subscription_schema.dump(topic_sub, many=False)
+            # HACK: Super hacky, will be removed when front end is updated
+            dump = topics_subscription_schema.dump(topic_sub, many=False)
+            result = list()
+            result.append(dump)
+            result.append(dict())
             try:
                 return jsonify(result[0])
             except:
@@ -380,7 +404,11 @@ def _get_user_topic_subscription():
     if current_user:
         user = User.query.filter_by(username=current_user).first()
         topic_subs = Topic_Subscription.query.filter_by(user_id=user.id).all()
-        result = topics_subscription_schema.dump(topic_subs, many=True)
+        # HACK: Super hacky, will be removed when front end is updated
+        dump = topics_subscription_schema.dump(topic_subs, many=True)
+        result = list()
+        result.append(dump)
+        result.append(dict())
         try:
             return jsonify(result[0])
         except:
