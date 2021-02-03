@@ -6,7 +6,7 @@ verify_ssl = true
 [dev-packages]
 
 [packages]
-alembic = "==1.4.0"
+alembic = "==1.5.4"
 bcrypt = "==3.1.7"
 cffi = "==1.14.0"
 click = "==7.0"
